@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_014611) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_31_032439) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_014611) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_drivers_on_email", unique: true
     t.index ["reset_password_token"], name: "index_drivers_on_reset_password_token", unique: true
+  end
+
+  create_table "rest_areas", force: :cascade do |t|
+    t.string "object_uid"
+    t.string "state_number"
+    t.string "nhs_rest_stop"
+    t.string "highway_route"
+    t.decimal "mile_post", precision: 10, scale: 2
+    t.string "municipality"
+    t.string "county"
+    t.string "state"
+    t.decimal "lat", precision: 10, scale: 6
+    t.decimal "lon", precision: 10, scale: 6
+    t.integer "number_of_spots"
+    t.decimal "x", precision: 12, scale: 6
+    t.decimal "y", precision: 12, scale: 6
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lat", "lon"], name: "index_rest_areas_on_lat_and_lon"
+    t.index ["object_uid"], name: "index_rest_areas_on_object_uid", unique: true
+    t.index ["state", "highway_route", "mile_post"], name: "index_rest_areas_on_state_and_highway_route_and_mile_post"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -167,6 +189,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_014611) do
     t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
     t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
+  end
+
+  create_table "weigh_stations", force: :cascade do |t|
+    t.string "station_uid"
+    t.string "concat_id"
+    t.string "fips_code"
+    t.string "state"
+    t.string "functional"
+    t.decimal "lat", precision: 10, scale: 6
+    t.decimal "lon", precision: 10, scale: 6
+    t.integer "counts_year"
+    t.bigint "sum_weight_year"
+    t.integer "num_days_active"
+    t.decimal "x", precision: 12, scale: 6
+    t.decimal "y", precision: 12, scale: 6
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lat", "lon"], name: "index_weigh_stations_on_lat_and_lon"
+    t.index ["state", "functional"], name: "index_weigh_stations_on_state_and_functional"
+    t.index ["station_uid"], name: "index_weigh_stations_on_station_uid", unique: true
   end
 
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
