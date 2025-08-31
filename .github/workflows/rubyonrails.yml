@@ -58,3 +58,5 @@ jobs:
         run: bin/brakeman -q -w2
       - name: Lint Ruby files
         run: bin/rubocop --parallel
+      - name: Run rspec tests
+        run: bundle exec rspec
