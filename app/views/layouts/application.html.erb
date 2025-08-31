@@ -25,18 +25,20 @@
   <body>
   <p class="notice"><%= notice %></p>
 <p class="alert"><%= alert %></p>
-    <nav style="padding:.75rem 1rem; border-bottom:1px solid #eee;">
-  <a href="<%= root_path %>"><strong>RigRadar</strong></a>
+
+ <nav style="padding:.75rem 1rem; border-bottom:1px solid #eee;">
+  <%= link_to "RigRadar", root_path %>
   <span style="float:right;">
     <% if driver_signed_in? %>
-      <a href="<%= root_path %>">My Loads</a>
+      <%= link_to "Account", edit_driver_registration_path %>
       <%= button_to "Sign out", destroy_driver_session_path, method: :delete, form: { style: "display:inline" } %>
     <% else %>
-      <a href="<%= new_driver_session_path %>">Sign in</a>
-      <a href="<%= new_driver_registration_path %>">Create account</a>
+      <%= link_to "Sign in",  new_driver_session_path %>
+      <%= link_to "Sign up",  new_driver_registration_path %>
     <% end %>
   </span>
 </nav>
+
 <%= yield %>
 
   </body>
