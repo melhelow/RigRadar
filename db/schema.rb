@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_032439) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_31_235107) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_032439) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_drivers_on_email", unique: true
     t.index ["reset_password_token"], name: "index_drivers_on_reset_password_token", unique: true
+  end
+
+  create_table "loads", force: :cascade do |t|
+    t.bigint "driver_id", null: false
+    t.string "commodity"
+    t.integer "weight_lbs"
+    t.string "pickup_location"
+    t.string "dropoff_location"
+    t.decimal "pickup_lat", precision: 10, scale: 6
+    t.decimal "pickup_lon", precision: 10, scale: 6
+    t.decimal "dropoff_lat", precision: 10, scale: 6
+    t.decimal "dropoff_lon", precision: 10, scale: 6
+    t.datetime "deadline"
+    t.integer "status"
+    t.datetime "started_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_loads_on_driver_id"
   end
 
   create_table "rest_areas", force: :cascade do |t|
@@ -212,6 +230,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_032439) do
     t.index ["station_uid"], name: "index_weigh_stations_on_station_uid", unique: true
   end
 
+  add_foreign_key "loads", "drivers"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
