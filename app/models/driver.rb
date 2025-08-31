@@ -18,8 +18,7 @@
 #  index_drivers_on_reset_password_token  (reset_password_token) UNIQUE
 #
 class Driver < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
+  has_many :loads, dependent: :nullify
 end
+

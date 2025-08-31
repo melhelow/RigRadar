@@ -28,4 +28,21 @@
 #
 class Load < ApplicationRecord
   belongs_to :driver
+  enum status: { planned: 0, in_transit: 1, delivered: 2, dropped: 3 }
+
+  validates :commodity, :weight_lbs, :pickup_location, :dropoff_location, presence: true
+
+  after_validation :geocode_pickup,  if: -> { will_save_change_to_pickup_location? }
+  after_validation :geocode_dropoff, if: -> { will_save_change_to_dropoff_location? }
+
+  private
+  def geocode_pickup
+    coords = Geocoder.search(pickup_location).first&.coordinates
+    self.pickup_lat, self.pickup_lon = coords if coords
+  end
+  def geocode_dropoff
+    coords = Geocoder.search(dropoff_location).first&.coordinates
+    self.dropoff_lat, self.dropoff_lon = coords if coords
+  end
 end
+
