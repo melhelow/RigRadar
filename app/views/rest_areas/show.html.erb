@@ -1,2 +1,8 @@
-<h1>RestAreas#show</h1>
-<p>Find me in app/views/rest_areas/show.html.erb</p>
+<h1><%= @rest_area.name.presence || "Rest Area" %></h1>
+<p><strong>State:</strong> <%= @rest_area.state %></p>
+<p><strong>Route:</strong> <%= @rest_area.highway_route %> <% if @rest_area.mile_post %>(MP <%= @rest_area.mile_post %>)<% end %></p>
+<p><strong>Parking spots:</strong> <%= @rest_area.number_of_spots %></p>
+<% if @rest_area.lat && @rest_area.lon %>
+  <p><a target="_blank" rel="noopener" href="https://www.google.com/maps?q=<%= @rest_area.lat %>,<%= @rest_area.lon %>">Open in Google Maps</a></p>
+<% end %>
+<p><%= link_to "Back", rest_areas_path %></p>
