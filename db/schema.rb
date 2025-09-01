@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_01_213057) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_01_220347) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -207,6 +207,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_213057) do
     t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
     t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
+  end
+
+  create_table "truck_stops", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "provider"
+    t.string "website"
+    t.string "phone"
+    t.string "opening_hours"
+    t.string "street"
+    t.string "city"
+    t.string "state", limit: 2
+    t.string "zip_code"
+    t.string "country", default: "US"
+    t.string "status", default: "active"
+    t.text "direction_url"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.integer "parking_truck"
+    t.integer "parking_rv"
+    t.text "raw_details"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["latitude", "longitude"], name: "index_truck_stops_on_latitude_and_longitude"
+    t.index ["name", "latitude", "longitude"], name: "index_truck_stops_on_name_lat_lon", unique: true
+    t.index ["provider"], name: "index_truck_stops_on_provider"
   end
 
   create_table "weigh_stations", force: :cascade do |t|
