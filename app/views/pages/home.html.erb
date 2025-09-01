@@ -1,6 +1,12 @@
-<section style="padding:2rem;">
+<!-- app/views/pages/home.html.erb -->
+<section style="padding:2rem 0;">
   <h1>RigRadar</h1>
-  <p>Enter pickup & drop-off, press <strong>Start</strong>, and see <strong>Rest Areas</strong> and <strong>Weigh Stations</strong> along your route. No lat/lon needed.</p>
-  <p><a class="btn btn-primary" href="#">Get Started</a></p>
-</section>
+  <p>Plan your route and see rest areas & DOT weigh stations along the way.</p>
 
+  <p style="margin-top:1rem;">
+    <%= link_to "Get Started", new_driver_session_path, class: "btn btn-primary" %>
+    <span style="margin-left:.5rem;">
+      New here? <%= link_to "Create account", new_driver_registration_path %>
+    </span>
+  </p>
+</section>
