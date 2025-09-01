@@ -1,6 +1,18 @@
 class LoadsController < ApplicationController
   before_action :authenticate_driver!
   before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan]
+  before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan, :regeocode]
+# ...
+def regeocode
+  @load.pickup_location_will_change!
+  @load.dropoff_location_will_change!
+  if @load.save
+    redirect_to plan_load_path(@load), notice: "Coordinates refreshed."
+  else
+    redirect_to @load, alert: "Could not refresh coordinates."
+  end
+end
+
 
   def index
     @loads = current_driver.loads.order(created_at: :desc)

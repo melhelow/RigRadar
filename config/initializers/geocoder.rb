@@ -1,19 +1,47 @@
-if Rails.env.development? || Rails.env.test?
+# config/initializers/geocoder.rb
+# Dynamic provider selection:
+# - TEST: always stub (for CI/specs)
+# - DEV: real provider by default; optional OFFLINE stub
+# - PROD: real provider
+
+if Rails.env.test?
   Geocoder.configure(lookup: :test, units: :mi)
-
-  Geocoder::Lookup::Test.add_stub("Des Moines, IA", [{ "coordinates" => [41.5868, -93.6250] }])
-  Geocoder::Lookup::Test.add_stub("Des Moines, IA, USA", [{ "coordinates" => [41.5868, -93.6250] }])
-
-  Geocoder::Lookup::Test.add_stub("Chicago, IL", [{ "coordinates" => [41.8781, -87.6298] }])
-  Geocoder::Lookup::Test.add_stub("Chicago, IL, USA", [{ "coordinates" => [41.8781, -87.6298] }])
-
-  # If a query isn't stubbed, return no results
   Geocoder::Lookup::Test.set_default_stub([])
+elsif Rails.env.development?
+  if ENV["OFFLINE"] == "1" || ENV["GEOCODER_PROVIDER"] == "test"
+    Geocoder.configure(lookup: :test, units: :mi)
+    Geocoder::Lookup::Test.set_default_stub([]) # no hard-coded cities
+  else
+    # Dynamic: use Nominatim (OSM). Respect their policy and set a UA/contact.
+    Geocoder.configure(
+      lookup: :nominatim,
+      timeout: 5,
+      units: :mi,
+      http_headers: { "User-Agent" => "RigRadar Dev (contact: you@example.com)" },
+      cache: Rails.cache,
+      cache_prefix: "geocoder:"
+    )
+  end
 else
-  Geocoder.configure(
-    timeout: 5,
-    lookup: :nominatim,
-    units: :mi,
-    http_headers: { "User-Agent" => "RigRadar/1.0 (contact: you@example.com)" }
-  )
+  # Production: use Google if key present, else Nominatim
+  if ENV["GOOGLE_MAPS_API_KEY"].present?
+    Geocoder.configure(
+      lookup: :google,
+      api_key: ENV["GOOGLE_MAPS_API_KEY"],
+      timeout: 5,
+      units: :mi,
+      cache: Rails.cache,
+      cache_prefix: "geocoder:"
+    )
+  else
+    Geocoder.configure(
+      lookup: :nominatim,
+      timeout: 5,
+      units: :mi,
+      http_headers: { "User-Agent" => "RigRadar Prod (contact: you@example.com)" },
+      cache: Rails.cache,
+      cache_prefix: "geocoder:"
+    )
+  end
 end
+
