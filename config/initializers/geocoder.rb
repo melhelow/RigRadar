@@ -1,8 +1,4 @@
-# config/initializers/geocoder.rb
-# Dynamic provider selection:
-# - TEST: always stub (for CI/specs)
-# - DEV: real provider by default; optional OFFLINE stub
-# - PROD: real provider
+
 
 if Rails.env.test?
   Geocoder.configure(lookup: :test, units: :mi)
@@ -10,9 +6,9 @@ if Rails.env.test?
 elsif Rails.env.development?
   if ENV["OFFLINE"] == "1" || ENV["GEOCODER_PROVIDER"] == "test"
     Geocoder.configure(lookup: :test, units: :mi)
-    Geocoder::Lookup::Test.set_default_stub([]) # no hard-coded cities
+    Geocoder::Lookup::Test.set_default_stub([]) 
   else
-    # Dynamic: use Nominatim (OSM). Respect their policy and set a UA/contact.
+    
     Geocoder.configure(
       lookup: :nominatim,
       timeout: 5,
@@ -23,7 +19,7 @@ elsif Rails.env.development?
     )
   end
 else
-  # Production: use Google if key present, else Nominatim
+
   if ENV["GOOGLE_MAPS_API_KEY"].present?
     Geocoder.configure(
       lookup: :google,
@@ -44,4 +40,3 @@ else
     )
   end
 end
-
