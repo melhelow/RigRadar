@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_235107) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_01_001753) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,7 +38,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_235107) do
     t.decimal "dropoff_lat", precision: 10, scale: 6
     t.decimal "dropoff_lon", precision: 10, scale: 6
     t.datetime "deadline"
-    t.integer "status"
+    t.integer "status", default: 0, null: false
     t.datetime "started_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

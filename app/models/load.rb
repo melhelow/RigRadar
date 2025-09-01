@@ -12,7 +12,7 @@
 #  pickup_location  :string
 #  pickup_lon       :decimal(10, 6)
 #  started_at       :datetime
-#  status           :integer
+#  status           :integer          default("planned"), not null
 #  weight_lbs       :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
@@ -28,12 +28,18 @@
 #
 class Load < ApplicationRecord
   belongs_to :driver
-  enum status: { planned: 0, in_transit: 1, delivered: 2, dropped: 3 }
+
+  enum :status, {
+    planned:     0,
+    in_transit:  1,
+    delivered:   2,
+    dropped:     3
+  }
 
   validates :commodity, :weight_lbs, :pickup_location, :dropoff_location, presence: true
 
-  after_validation :geocode_pickup,  if: -> { will_save_change_to_pickup_location? }
-  after_validation :geocode_dropoff, if: -> { will_save_change_to_dropoff_location? }
+  after_validation :geocode_pickup,  if: -> { will_save_change_to_attribute?(:pickup_location) }
+  after_validation :geocode_dropoff, if: -> { will_save_change_to_attribute?(:dropoff_location) }
 
   private
   def geocode_pickup
@@ -45,4 +51,3 @@ class Load < ApplicationRecord
     self.dropoff_lat, self.dropoff_lon = coords if coords
   end
 end
-

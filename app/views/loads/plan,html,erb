@@ -1,0 +1,4 @@
+<!-- app/views/loads/plan.html.erb -->
+<h1>Route Plan for Load <%= @load.id %></h1>
+<p>This page will show rest areas and weigh stations along the route in Step 6.</p>
+<p><%= link_to "Back to Load", load_path(@load) %></p>

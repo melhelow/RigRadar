@@ -1,0 +1,7 @@
+<h1>Your Loads</h1>
+<p><%= link_to "New Load", new_load_path, class: "btn btn-primary" %></p>
+<ul>
+  <% @loads.each do |l| %>
+    <li><%= link_to "Load ##{l.id} - #{l.commodity}", l %> (<%= l.status %>)</li>
+  <% end %>
+</ul>
