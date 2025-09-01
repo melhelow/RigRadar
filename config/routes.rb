@@ -1,5 +1,9 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  get "weigh_stations/index"
+  get "weigh_stations/show"
+  get "rest_areas/index"
+  get "rest_areas/show"
   devise_for :drivers
 
   # App
