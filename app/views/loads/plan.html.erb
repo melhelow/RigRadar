@@ -1,4 +1,61 @@
-<!-- app/views/loads/plan.html.erb -->
 <h1>Route Plan for Load <%= @load.id %></h1>
-<p>lorem ipsum dolor sit amet.</p>
-<p><%= link_to "Back to Load", load_path(@load) %></p>
+
+<p>
+  <strong>Pickup:</strong> <%= @load.pickup_location %><br>
+  <strong>Drop-off:</strong> <%= @load.dropoff_location %>
+</p>
+
+<%= form_with url: plan_load_path(@load), method: :get, local: true do %>
+  <label>Buffer (miles):</label>
+  <%= number_field_tag :buffer, @buffer || 15, in: 5..50, step: 1 %>
+  <%= submit_tag "Update", class: "btn btn-secondary" %>
+<% end %>
+
+<p style="margin:.5rem 0;">
+  <em>Found <%= @rest_areas_on_route&.size || 0 %> rest areas and
+      <%= @weigh_stations_on_route&.size || 0 %> weigh stations within <%= @buffer || 15 %> miles.</em>
+</p>
+
+<p>
+  <%= link_to "Back to Load", load_path(@load), class: "btn" %>
+</p>
+
+<hr>
+
+<div style="display:flex; gap:2rem; align-items:flex-start;">
+  <div style="flex:1;">
+    <h3>Rest Areas</h3>
+    <% if @rest_areas_on_route.present? %>
+      <ul>
+        <% @rest_areas_on_route.each do |r| %>
+          <li>
+            <%= link_to (r.name.presence || "Rest Area"), rest_area_path(r) %>
+            <small>
+              — <%= r.state %> <%= r.highway_route %>
+              <% if r.respond_to?(:mile_post) && r.mile_post.present? %> • MP <%= r.mile_post %><% end %>
+              <% if r.respond_to?(:number_of_spots) && r.number_of_spots.present? %> • Spots: <%= r.number_of_spots %><% end %>
+            </small>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No rest areas in this corridor. Try a larger buffer.</p>
+    <% end %>
+  </div>
+
+  <div style="flex:1;">
+    <h3>Weigh Stations</h3>
+    <% if @weigh_stations_on_route.present? %>
+      <ul>
+        <% @weigh_stations_on_route.each do |w| %>
+          <li>
+            <%= link_to (w.name.presence || "Weigh Station"), weigh_station_path(w) %>
+            <small> — <%= w.state %></small>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No weigh stations in this corridor. Try a larger buffer.</p>
+    <% end %>
+  </div>
+</div>

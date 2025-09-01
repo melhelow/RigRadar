@@ -9,5 +9,7 @@
   <%= button_to "Start",    start_load_path(@load),    method: :patch, class: "btn btn-primary" %>
   <%= button_to "Deliver",  deliver_load_path(@load),  method: :patch, class: "btn" %>
   <%= button_to "Drop",     drop_load_path(@load),     method: :patch, class: "btn" %>
+  <%= button_to "Refresh Coordinates", regeocode_load_path(@load), method: :patch %>
+
 </p>
 <p><%= link_to "Back to Loads", loads_path %></p>

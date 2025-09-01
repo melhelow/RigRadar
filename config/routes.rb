@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       patch :start
       patch :deliver
       patch :drop
+      patch :regeocode 
     end
   end
   resources :rest_areas,     only: [:index, :show]
