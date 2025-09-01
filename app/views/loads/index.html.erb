@@ -1,7 +1,15 @@
+
 <h1>Your Loads</h1>
-<p><%= link_to "New Load", new_load_path, class: "btn btn-primary" %></p>
+<p><%= link_to "New Load", new_load_path %></p>
+
 <ul>
   <% @loads.each do |l| %>
-    <li><%= link_to "Load ##{l.id} - #{l.commodity}", l %> (<%= l.status %>)</li>
+    <li>
+      <%= link_to "Load ##{l.id} - #{l.commodity}", l %> (<%= l.status %>)
+      — <%= link_to "Plan", plan_load_path(l) %>
+      — <%= link_to "Edit", edit_load_path(l) %>
+      — <%= button_to "Delete", load_path(l), method: :delete, form: { style: "display:inline" },
+            data: { turbo_confirm: "Delete Load ##{l.id}?" } %>
+    </li>
   <% end %>
 </ul>
