@@ -90,7 +90,8 @@
   <ul>
     <% @truck_stops_on_route.each do |t| %>
       <li style="margin:.4rem 0;">
-        <strong><%= t.name %></strong>
+       <strong><%= t.name %></strong> <%= provider_badge(t.provider) %><br>
+
         <% if t.provider.present? %>(<%= t.provider %>)<% end %><br>
         <small>
           <%= [t.street, t.city, t.state, t.zip_code].compact.join(", ") %>
