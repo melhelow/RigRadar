@@ -79,6 +79,10 @@ def plan
   min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
   ts_box = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
 
+  if params[:providers].present?
+  ts_box = ts_box.where(provider: params[:providers])
+end
+
   # --- Dynamic column detection (handles lat/lon vs latitude/longitude) ---
   ra_lat_col = RestArea.column_names.include?("lat") ? :lat : :latitude
   ra_lon_col = RestArea.column_names.include?("lon") ? :lon : :longitude
