@@ -92,6 +92,10 @@ end
   t.latitude && t.longitude && corridor.include_point?(t.latitude, t.longitude)
 end
 
+if @truck_stops_on_route.any? && corridor.respond_to?(:progress_miles)
+  @truck_stops_on_route.sort_by! { |t| corridor.progress_miles(t.latitude, t.longitude) }
+end
+
   # --- Dynamic column detection (handles lat/lon vs latitude/longitude) ---
   ra_lat_col = RestArea.column_names.include?("lat") ? :lat : :latitude
   ra_lon_col = RestArea.column_names.include?("lon") ? :lon : :longitude
