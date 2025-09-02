@@ -48,7 +48,7 @@ end
     redirect_to loads_path, notice: "Load deleted."
   end
 
-  # state changes (MVP)
+  
   def start
     @load.update!(status: :in_transit, started_at: Time.current)
     redirect_to @load, notice: "Load started."
@@ -62,8 +62,7 @@ end
     redirect_to @load, notice: "Load dropped."
   end
 
-  # route planning (bonus)
-  # app/controllers/loads_controller.rb
+
 def plan
   unless @load.pickup_lat && @load.pickup_lon && @load.dropoff_lat && @load.dropoff_lon
     redirect_to @load, alert: "Missing coordinates. Edit the load locations and save again." and return
@@ -78,6 +77,7 @@ def plan
     buffer_miles: buffer
   )
   min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
+  ts_box = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
 
   # --- Dynamic column detection (handles lat/lon vs latitude/longitude) ---
   ra_lat_col = RestArea.column_names.include?("lat") ? :lat : :latitude
