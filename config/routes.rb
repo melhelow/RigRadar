@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   end
   resources :rest_areas,     only: [:index, :show]
   resources :weigh_stations, only: [:index, :show]
+  resources :truck_stops,     only: [:index, :show]
 
   # Public pages
   get "about", to: "pages#about"
