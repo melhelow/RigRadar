@@ -1,4 +1,5 @@
 class TruckStopsController < ApplicationController
+  before_action :authenticate_driver!
   def index
     @providers = [
       "Love's", "Pilot", "Flying J", "TA", "Petro", "AMBEST", "Pilot Flying J"
