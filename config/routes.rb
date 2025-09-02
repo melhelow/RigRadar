@@ -1,5 +1,7 @@
 # config/routes.rb
 Rails.application.routes.draw do
+  get "truck_stops/index"
+  get "truck_stops/show"
   get "weigh_stations/index"
   get "weigh_stations/show"
   get "rest_areas/index"
