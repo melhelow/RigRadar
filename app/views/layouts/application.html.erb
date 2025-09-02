@@ -26,18 +26,17 @@
   <p class="notice"><%= notice %></p>
 <p class="alert"><%= alert %></p>
 
-<nav style="padding:.75rem 1rem; border-bottom:1px solid #eee; display:flex; gap:1rem; align-items:center; justify-content:space-between;">
-  <div>
+<nav style="padding:.75rem 1rem; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between;">
+  <div style="display:flex; gap:1rem; align-items:center;">
     <%= link_to "RigRadar", root_path %>
 
+    <%# Left-side navigation %>
+    <%= link_to "Rest Areas",      rest_areas_path %>
+    <%= link_to "Weigh Stations",  weigh_stations_path %>
+    <%= link_to "Truck Stops",     truck_stops_path %>
+
     <% if driver_signed_in? %>
-      <!-- Signed-in navigation -->
-      &nbsp; | <%= link_to "Loads", loads_path %>
-      &nbsp; | <%= link_to "Rest Areas", rest_areas_path %>
-      &nbsp; | <%= link_to "Weigh Stations", weigh_stations_path %>
-    <% else %>
-      <!-- Public navigation -->
-      &nbsp; | <%= link_to "About", (respond_to?(:about_path) ? about_path : "#") %>
+      <%= link_to "Loads", loads_path %>
     <% end %>
   </div>
 
@@ -51,6 +50,7 @@
     <% end %>
   </div>
 </nav>
+
 
 
 <%= yield %>
