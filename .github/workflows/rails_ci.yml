@@ -1,54 +1,84 @@
 # This workflow will install a prebuilt Ruby version, install dependencies, and
 # run tests and linters.
 name: "Ruby on Rails CI"
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
     services:
       postgres:
-        image: postgres:11-alpine
-        ports:
-          - "5432:5432"
+        image: postgres:15
         env:
           POSTGRES_DB: rails_test
           POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U rails"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
+      DATABASE_URL: postgres://rails:password@localhost:5432/rails_test
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
         with:
+          ruby-version: "3.3.6"   # override CI Ruby; avoids 3.4.1 error
           bundler-cache: true
-      - name: Set up database schema
-        run: bin/rails db:schema:load
-      # This runs the tests in the spec/ folder
-      - name: Run rspec tests
+
+      - name: Prepare DB (migrations & schema)
+        run: bin/rails db:prepare
+
+      - name: Run RSpec tests (if present)
+        if: ${{ hashFiles('spec/**/*') != '' }}
         run: bundle exec rspec
+
+      - name: Run Minitest (if present)
+        if: ${{ hashFiles('test/**/*') != '' }}
+        run: bin/rails test
 
   lint:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
         with:
+          ruby-version: "3.3.6"
           bundler-cache: true
-      # Can add more (eg bundler-audit, brakeman, etc.)
-      - name: Lint Ruby files
+
+      - name: RuboCop
         run: bundle exec rubocop --parallel
-      - name: Lint Javascript files
-        uses: actions/setup-node@v3
+
+      # JS lint only if you actually have JS tooling
+      - name: Setup Node
+        if: ${{ hashFiles('package.json') != '' }}
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-      - run: npm ci
-      - run: npm run lint
+          node-version: "20"
+
+      - name: npm ci
+        if: ${{ hashFiles('package.json') != '' }}
+        run: npm ci
+
+      - name: npm run lint
+        if: ${{ hashFiles('package.json') != '' }}
+        run: |
+          if jq -e '.scripts.lint' package.json >/dev/null 2>&1; then
+            npm run lint
+          else
+            echo "No npm lint script; skipping."
+          fi
