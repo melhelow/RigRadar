@@ -88,6 +88,10 @@ if min_parking > 0
   ts_box = ts_box.where("parking_truck >= ?", min_parking)
 end
 
+@truck_stops_on_route = ts_box.select do |t|
+  t.latitude && t.longitude && corridor.include_point?(t.latitude, t.longitude)
+end
+
   # --- Dynamic column detection (handles lat/lon vs latitude/longitude) ---
   ra_lat_col = RestArea.column_names.include?("lat") ? :lat : :latitude
   ra_lon_col = RestArea.column_names.include?("lon") ? :lon : :longitude
