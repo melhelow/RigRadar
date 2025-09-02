@@ -83,6 +83,11 @@ def plan
   ts_box = ts_box.where(provider: params[:providers])
 end
 
+min_parking = params[:min_parking].to_i
+if min_parking > 0
+  ts_box = ts_box.where("parking_truck >= ?", min_parking)
+end
+
   # --- Dynamic column detection (handles lat/lon vs latitude/longitude) ---
   ra_lat_col = RestArea.column_names.include?("lat") ? :lat : :latitude
   ra_lon_col = RestArea.column_names.include?("lon") ? :lon : :longitude
