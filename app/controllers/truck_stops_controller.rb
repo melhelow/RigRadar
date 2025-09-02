@@ -25,5 +25,6 @@ class TruckStopsController < ApplicationController
   end
 
   def show
+     @truck_stop = TruckStop.find(params[:id])
   end
 end
