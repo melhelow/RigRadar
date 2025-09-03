@@ -1,0 +1,7 @@
+<h1><%= @weigh_station.name.presence || "Weigh Station" %></h1>
+<p><strong>State:</strong> <%= @weigh_station.state %></p>
+<p><strong>Functional class:</strong> <%= @weigh_station.functional.presence || "—" %></p>
+<% if @weigh_station.lat && @weigh_station.lon %>
+  <p><a target="_blank" rel="noopener" href="https://www.google.com/maps?q=<%= @weigh_station.lat %>,<%= @weigh_station.lon %>">Open in Google Maps</a></p>
+<% end %>
+<p><%= link_to "Back", weigh_stations_path %></p>

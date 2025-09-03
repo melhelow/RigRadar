@@ -10,9 +10,62 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_13_202311) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_01_220347) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "drivers", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_drivers_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_drivers_on_reset_password_token", unique: true
+  end
+
+  create_table "loads", force: :cascade do |t|
+    t.bigint "driver_id", null: false
+    t.string "commodity"
+    t.integer "weight_lbs"
+    t.string "pickup_location"
+    t.string "dropoff_location"
+    t.decimal "pickup_lat", precision: 10, scale: 6
+    t.decimal "pickup_lon", precision: 10, scale: 6
+    t.decimal "dropoff_lat", precision: 10, scale: 6
+    t.decimal "dropoff_lon", precision: 10, scale: 6
+    t.datetime "deadline"
+    t.integer "status", default: 0, null: false
+    t.datetime "started_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_loads_on_driver_id"
+  end
+
+  create_table "rest_areas", force: :cascade do |t|
+    t.string "object_uid"
+    t.string "state_number"
+    t.string "nhs_rest_stop"
+    t.string "highway_route"
+    t.decimal "mile_post", precision: 10, scale: 2
+    t.string "municipality"
+    t.string "county"
+    t.string "state"
+    t.decimal "lat", precision: 10, scale: 6
+    t.decimal "lon", precision: 10, scale: 6
+    t.integer "number_of_spots"
+    t.decimal "x", precision: 12, scale: 6
+    t.decimal "y", precision: 12, scale: 6
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lat", "lon"], name: "index_rest_areas_on_lat_and_lon"
+    t.index ["object_uid"], name: "index_rest_areas_on_object_uid", unique: true
+    t.index ["state", "highway_route", "mile_post"], name: "index_rest_areas_on_state_and_highway_route_and_mile_post"
+  end
 
   create_table "solid_cable_messages", force: :cascade do |t|
     t.binary "channel", null: false
@@ -156,6 +209,53 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_13_202311) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "truck_stops", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "provider"
+    t.string "website"
+    t.string "phone"
+    t.string "opening_hours"
+    t.string "street"
+    t.string "city"
+    t.string "state", limit: 2
+    t.string "zip_code"
+    t.string "country", default: "US"
+    t.string "status", default: "active"
+    t.text "direction_url"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.integer "parking_truck"
+    t.integer "parking_rv"
+    t.text "raw_details"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["latitude", "longitude"], name: "index_truck_stops_on_latitude_and_longitude"
+    t.index ["name", "latitude", "longitude"], name: "index_truck_stops_on_name_lat_lon", unique: true
+    t.index ["provider"], name: "index_truck_stops_on_provider"
+  end
+
+  create_table "weigh_stations", force: :cascade do |t|
+    t.string "station_uid"
+    t.string "concat_id"
+    t.string "fips_code"
+    t.string "state"
+    t.string "functional"
+    t.decimal "lat", precision: 10, scale: 6
+    t.decimal "lon", precision: 10, scale: 6
+    t.integer "counts_year"
+    t.bigint "sum_weight_year"
+    t.integer "num_days_active"
+    t.decimal "x", precision: 12, scale: 6
+    t.decimal "y", precision: 12, scale: 6
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lat", "lon"], name: "index_weigh_stations_on_lat_and_lon"
+    t.index ["state", "functional"], name: "index_weigh_stations_on_state_and_functional"
+    t.index ["station_uid"], name: "index_weigh_stations_on_station_uid", unique: true
+  end
+
+  add_foreign_key "loads", "drivers"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

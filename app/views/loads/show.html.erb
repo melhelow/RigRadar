@@ -1,0 +1,41 @@
+<!-- app/views/loads/show.html.erb -->
+<h1>Load <%= @load.id %></h1>
+
+<table>
+  <tr><th>Commodity</th><td><%= @load.commodity %></td></tr>
+  <tr><th>Weight (lbs)</th><td><%= @load.weight_lbs %></td></tr>
+  <tr><th>Pickup</th><td><%= @load.pickup_location %></td></tr>
+  <tr><th>Drop-off</th><td><%= @load.dropoff_location %></td></tr>
+  <tr>
+  <th>Deadline</th>
+  <td>
+    <% d = @load.deadline %>
+    <%= d.respond_to?(:strftime) ? d.strftime("%b %-d, %Y %-l:%M %p") : (d.presence || "—") %>
+  </td>
+</tr>
+<tr>
+  <th>Started at</th>
+  <td>
+    <% s = @load.started_at %>
+    <%= s.respond_to?(:strftime) ? s.strftime("%b %-d, %Y %-l:%M %p") : (s.presence || "—") %>
+  </td>
+</tr>
+
+  <tr><th>Status</th><td><%= @load.status %></td></tr>
+  <tr><th>Pickup coords</th><td><%= [@load.pickup_lat, @load.pickup_lon].compact.join(", ") %></td></tr>
+  <tr><th>Drop-off coords</th><td><%= [@load.dropoff_lat, @load.dropoff_lon].compact.join(", ") %></td></tr>
+</table>
+
+<p style="margin:.75rem 0;">
+  <%= link_to  "Plan Route", plan_load_path(@load), class: "btn btn-secondary" %>
+  <%= button_to "Start",     start_load_path(@load),    method: :patch %>
+  <%= button_to "Deliver",   deliver_load_path(@load),  method: :patch %>
+  <%= button_to "Drop",      drop_load_path(@load),     method: :patch %>
+</p>
+
+<p>
+  <%= link_to  "Edit",   edit_load_path(@load) %> |
+  <%= button_to "Delete", load_path(@load), method: :delete,
+        data: { turbo_confirm: "Delete this load?" } %> |
+  <%= link_to  "Back to Loads", loads_path %>
+</p>
