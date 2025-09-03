@@ -49,63 +49,86 @@
 <div style="display:flex; gap:2rem; align-items:flex-start;">
 
 <hr>
-<div style="flex:1;">
-<h3>Truck Stops</h3>
-<% if @truck_stops_on_route.present? %>
-  <ul>
-    <% @truck_stops_on_route.each do |t| %>
-      <li style="margin:.4rem 0;">
-       <strong><%= t.name %></strong> <%= provider_badge(t.provider) %><br>
 
-        <% if t.provider.present? %>(<%= t.provider %>)<% end %><br>
-        <small>
-          <%= [t.street, t.city, t.state, t.zip_code].compact.join(", ") %>
-          <% if t.parking_truck.present? %> • Truck parking: <%= t.parking_truck %><% end %>
-          <% if t.opening_hours.present? %> • Hours: <%= t.opening_hours %><% end %>
-          <% if t.website.present? %> • <a href="<%= t.website %>" target="_blank" rel="noopener">Website</a><% end %>
-          <% if t.direction_url.present? %> • <a href="<%= t.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
-        </small>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No truck stops in this corridor. Try a larger buffer or different filters.</p>
-<% end %>
-</div>
-  <div style="flex:1;">
-    <h3>Rest Areas</h3>
-    <% if @rest_areas_on_route.present? %>
-      <ul>
-        <% @rest_areas_on_route.each do |r| %>
-          <li>
-            <%= link_to (r.name.presence || "Rest Area"), rest_area_path(r) %>
-            <small>
-              — <%= r.state %> <%= r.highway_route %>
-              <% if r.respond_to?(:mile_post) && r.mile_post.present? %> • MP <%= r.mile_post %><% end %>
-              <% if r.respond_to?(:number_of_spots) && r.number_of_spots.present? %> • Spots: <%= r.number_of_spots %><% end %>
-            </small>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p>No rest areas in this corridor. Try a larger buffer.</p>
-    <% end %>
+<%= form_with url: add_stops_load_path(@load), method: :post, local: true do %>
+  <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
+    <!-- Truck Stops -->
+    <div style="flex:1; min-width:280px;">
+      <h3>Truck Stops</h3>
+      <% if @truck_stops_on_route.present? %>
+        <ul>
+          <% @truck_stops_on_route.each do |t| %>
+            <li style="margin:.4rem 0;">
+              <label>
+                <%= check_box_tag "selected[]", "TruckStop-#{t.id}" %>
+                <strong><%= t.name %></strong> <%= provider_badge(t.provider) %><br>
+                <small>
+                  <%= [t.street, t.city, t.state, t.zip_code].compact.join(", ") %>
+                  <% if t.parking_truck.present? %> • Truck parking: <%= t.parking_truck %><% end %>
+                  <% if t.opening_hours.present? %> • Hours: <%= t.opening_hours %><% end %>
+                  <% if t.website.present? %> • <a href="<%= t.website %>" target="_blank" rel="noopener">Website</a><% end %>
+                  <% if t.direction_url.present? %> • <a href="<%= t.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
+                </small>
+              </label>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>No truck stops in this corridor. Try a larger buffer or different filters.</p>
+      <% end %>
+    </div>
+
+    <!-- Rest Areas -->
+    <div style="flex:1; min-width:280px;">
+      <h3>Rest Areas</h3>
+      <% if @rest_areas_on_route.present? %>
+        <ul>
+          <% @rest_areas_on_route.each do |r| %>
+            <li>
+              <label>
+                <%= check_box_tag "selected[]", "RestArea-#{r.id}" %>
+                <strong><%= r.name.presence || "Rest Area" %></strong>
+                <small>
+                  — <%= r.state %> <%= r.highway_route %>
+                  <% if r.respond_to?(:mile_post) && r.mile_post.present? %> • MP <%= r.mile_post %><% end %>
+                  <% if r.respond_to?(:number_of_spots) && r.number_of_spots.present? %> • Spots: <%= r.number_of_spots %><% end %>
+                </small>
+              </label>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>No rest areas in this corridor. Try a larger buffer.</p>
+      <% end %>
+    </div>
+
+    <!-- Weigh Stations -->
+    <div style="flex:1; min-width:280px;">
+      <h3>Weigh Stations</h3>
+      <% if @weigh_stations_on_route.present? %>
+        <ul>
+          <% @weigh_stations_on_route.each do |w| %>
+            <li>
+              <label>
+                <%= check_box_tag "selected[]", "WeighStation-#{w.id}" %>
+                <strong><%= w.name.presence || "Weigh Station" %></strong>
+                <small> — <%= w.state %></small>
+              </label>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>No weigh stations in this corridor. Try a larger buffer.</p>
+      <% end %>
+    </div>
   </div>
-    
-  <div style="flex:1;">
-    <h3>Weigh Stations</h3>
-    <% if @weigh_stations_on_route.present? %>
-      <ul>
-        <% @weigh_stations_on_route.each do |w| %>
-          <li>
-            <%= link_to (w.name.presence || "Weigh Station"), weigh_station_path(w) %>
-            <small> — <%= w.state %></small>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p>No weigh stations in this corridor. Try a larger buffer.</p>
-    <% end %>
+
+  <div style="margin-top:1rem;">
+    <%= submit_tag "Save selected stops to this load", class: "btn btn-primary" %>
+    <%= link_to "Back to Load", load_path(@load), class: "btn" %>
+  </div>
+<% end %>
+
   </div>
 
 

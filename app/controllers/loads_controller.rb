@@ -18,7 +18,9 @@ end
     @loads = current_driver.loads.order(created_at: :desc)
   end
 
-  def show; end
+ def show
+  @selected_stops = @load.load_stops.includes(:stoppable).order(created_at: :desc)
+end
 
   def new
     @load = current_driver.loads.new
@@ -133,22 +135,22 @@ def regeocode
     redirect_to @load, alert: "Could not refresh coordinates."
   end
 end
-  def add_stops
-  tokens = Array(params[:selected]) # values like "RestArea-123"
-  allowed_types = %w[RestArea WeighStation TruckStop]
+def add_stops
+  selected = Array(params[:selected]) # values like ["TruckStop-123", "RestArea-45"]
+  created = 0
 
-  added = 0
-  tokens.each do |token|
-    type, id = token.split("-", 2)
-    next unless allowed_types.include?(type) && id.to_i.positive?
+  selected.each do |token|
+    type, id_str = token.to_s.split("-", 2)
+    next unless type.present? && id_str.to_i.positive?
 
-    LoadStop.find_or_create_by!(load: @load, stoppable_type: type, stoppable_id: id.to_i)
-    added += 1
+    case type
+    when "TruckStop", "RestArea", "WeighStation"
+      @load.load_stops.find_or_create_by!(stoppable_type: type, stoppable_id: id_str.to_i)
+      created += 1
+    end
   end
 
-  redirect_to @load, notice: "#{added} stop#{'s' if added != 1} added to this load."
-rescue ActiveRecord::RecordInvalid => e
-  redirect_to plan_load_path(@load), alert: "Could not add some stops: #{e.message}"
+  redirect_to @load, notice: "#{created} stop#{'s' if created != 1} added to this load."
 end
 
 def remove_stop
@@ -160,6 +162,7 @@ def remove_stop
     redirect_to @load, alert: "Stop not found."
   end
 end
+
 
   private
   def set_load

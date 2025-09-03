@@ -1,41 +1,80 @@
-<!-- app/views/loads/show.html.erb -->
 <h1>Load <%= @load.id %></h1>
 
-<table>
-  <tr><th>Commodity</th><td><%= @load.commodity %></td></tr>
-  <tr><th>Weight (lbs)</th><td><%= @load.weight_lbs %></td></tr>
-  <tr><th>Pickup</th><td><%= @load.pickup_location %></td></tr>
-  <tr><th>Drop-off</th><td><%= @load.dropoff_location %></td></tr>
-  <tr>
-  <th>Deadline</th>
-  <td>
-    <% d = @load.deadline %>
-    <%= d.respond_to?(:strftime) ? d.strftime("%b %-d, %Y %-l:%M %p") : (d.presence || "—") %>
-  </td>
-</tr>
-<tr>
-  <th>Started at</th>
-  <td>
-    <% s = @load.started_at %>
-    <%= s.respond_to?(:strftime) ? s.strftime("%b %-d, %Y %-l:%M %p") : (s.presence || "—") %>
-  </td>
-</tr>
-
-  <tr><th>Status</th><td><%= @load.status %></td></tr>
-  <tr><th>Pickup coords</th><td><%= [@load.pickup_lat, @load.pickup_lon].compact.join(", ") %></td></tr>
-  <tr><th>Drop-off coords</th><td><%= [@load.dropoff_lat, @load.dropoff_lon].compact.join(", ") %></td></tr>
-</table>
-
-<p style="margin:.75rem 0;">
-  <%= link_to  "Plan Route", plan_load_path(@load), class: "btn btn-secondary" %>
-  <%= button_to "Start",     start_load_path(@load),    method: :patch %>
-  <%= button_to "Deliver",   deliver_load_path(@load),  method: :patch %>
-  <%= button_to "Drop",      drop_load_path(@load),     method: :patch %>
+<p>
+  <strong>Commodity:</strong> <%= @load.commodity %><br>
+  <strong>Weight (lbs):</strong> <%= @load.weight_lbs %><br>
+  <strong>Pickup:</strong> <%= @load.pickup_location %><br>
+  <strong>Drop-off:</strong> <%= @load.dropoff_location %><br>
+  <strong>Status:</strong> <%= @load.status.humanize %>
 </p>
 
 <p>
-  <%= link_to  "Edit",   edit_load_path(@load) %> |
-  <%= button_to "Delete", load_path(@load), method: :delete,
-        data: { turbo_confirm: "Delete this load?" } %> |
-  <%= link_to  "Back to Loads", loads_path %>
+  <%= link_to "Plan route", plan_load_path(@load), class: "btn btn-secondary" %>
+  <%= link_to "Edit", edit_load_path(@load), class: "btn" %>
+  <%= button_to "Delete", load_path(@load), method: :delete, data: { confirm: "Delete this load?" }, class: "btn btn-danger" %>
 </p>
+
+<hr>
+
+<h3>Saved Stops for This Load</h3>
+
+<% if @selected_stops.present? %>
+  <ul>
+    <% @selected_stops.each do |ls| %>
+      <% s = ls.stoppable %>
+      <li style="margin:.4rem 0;">
+        <% case ls.stoppable_type
+           when "TruckStop" %>
+             <strong><%= s.name %></strong>
+             <%# provider_badge optional helper; fallback to plain text if you don't have it %>
+             <% if s.respond_to?(:provider) && s.provider.present? %>
+               <span style="border:1px solid #ddd; border-radius:6px; padding:2px 6px; font-size:.8rem; margin-left:.25rem;">
+                 <%= s.provider %>
+               </span>
+             <% end %>
+             <small>
+               <% parts = [s.try(:street), s.try(:city), s.try(:state), s.try(:zip_code)].compact.reject(&:blank?) %>
+               <% if parts.any? %> — <%= parts.join(", ") %><% end %>
+               <% if s.try(:parking_truck).present? %> • Truck parking: <%= s.parking_truck %><% end %>
+               <% if s.try(:opening_hours).present? %> • Hours: <%= s.opening_hours %><% end %>
+               <% if s.try(:website).present? %> • <a href="<%= s.website %>" target="_blank" rel="noopener">Website</a><% end %>
+               <% if s.try(:direction_url).present? %> • <a href="<%= s.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
+             </small>
+
+        <% when "RestArea" %>
+             <strong><%= s.try(:name).presence || "Rest Area" %></strong>
+             <small>
+               <% bits = [] %>
+               <% bits << s.try(:state) if s.respond_to?(:state) %>
+               <% bits << s.try(:highway_route) if s.respond_to?(:highway_route) %>
+               <% if s.respond_to?(:mile_post) && s.mile_post.present? %>
+                 <% bits << "MP #{s.mile_post}" %>
+               <% end %>
+               <% if s.respond_to?(:number_of_spots) && s.number_of_spots.present? %>
+                 <% bits << "Spots: #{s.number_of_spots}" %>
+               <% end %>
+               <% if bits.any? %> — <%= bits.join(" • ") %><% end %>
+             </small>
+
+        <% when "WeighStation" %>
+             <strong><%= s.try(:name).presence || "Weigh Station" %></strong>
+             <small>
+               <% wsbits = [] %>
+               <% wsbits << s.try(:state) if s.respond_to?(:state) %>
+               <% wsbits << s.try(:functional) if s.respond_to?(:functional) %>
+               <% if wsbits.any? %> — <%= wsbits.join(" • ") %><% end %>
+             </small>
+        <% end %>
+
+        <%= button_to "Remove",
+                      remove_stop_load_path(@load, stop_id: ls.id),
+                      method: :delete,
+                      form: { style: "display:inline" },
+                      class: "btn btn-link",
+                      data: { confirm: "Remove this stop from the load?" } %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No stops saved yet. Go to <%= link_to "Plan route", plan_load_path(@load) %> to add some.</p>
+<% end %>
