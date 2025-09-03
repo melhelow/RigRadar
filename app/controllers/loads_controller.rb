@@ -1,7 +1,7 @@
 class LoadsController < ApplicationController
   before_action :authenticate_driver!
-  before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan]
-  before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan, :regeocode]
+ 
+  before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan, :regeocode, :add_stops, :remove_stop]
 # ...
 def regeocode
   @load.pickup_location_will_change!
@@ -131,6 +131,33 @@ def regeocode
     redirect_to plan_load_path(@load), notice: "Coordinates refreshed."
   else
     redirect_to @load, alert: "Could not refresh coordinates."
+  end
+end
+  def add_stops
+  tokens = Array(params[:selected]) # values like "RestArea-123"
+  allowed_types = %w[RestArea WeighStation TruckStop]
+
+  added = 0
+  tokens.each do |token|
+    type, id = token.split("-", 2)
+    next unless allowed_types.include?(type) && id.to_i.positive?
+
+    LoadStop.find_or_create_by!(load: @load, stoppable_type: type, stoppable_id: id.to_i)
+    added += 1
+  end
+
+  redirect_to @load, notice: "#{added} stop#{'s' if added != 1} added to this load."
+rescue ActiveRecord::RecordInvalid => e
+  redirect_to plan_load_path(@load), alert: "Could not add some stops: #{e.message}"
+end
+
+def remove_stop
+  ls = @load.load_stops.find_by(id: params[:stop_id])
+  if ls
+    ls.destroy
+    redirect_to @load, notice: "Stop removed."
+  else
+    redirect_to @load, alert: "Stop not found."
   end
 end
 
