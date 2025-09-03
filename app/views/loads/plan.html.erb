@@ -47,43 +47,8 @@
 <hr>
 
 <div style="display:flex; gap:2rem; align-items:flex-start;">
-  <div style="flex:1;">
-    <h3>Rest Areas</h3>
-    <% if @rest_areas_on_route.present? %>
-      <ul>
-        <% @rest_areas_on_route.each do |r| %>
-          <li>
-            <%= link_to (r.name.presence || "Rest Area"), rest_area_path(r) %>
-            <small>
-              — <%= r.state %> <%= r.highway_route %>
-              <% if r.respond_to?(:mile_post) && r.mile_post.present? %> • MP <%= r.mile_post %><% end %>
-              <% if r.respond_to?(:number_of_spots) && r.number_of_spots.present? %> • Spots: <%= r.number_of_spots %><% end %>
-            </small>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p>No rest areas in this corridor. Try a larger buffer.</p>
-    <% end %>
-  </div>
 
-  <div style="flex:1;">
-    <h3>Weigh Stations</h3>
-    <% if @weigh_stations_on_route.present? %>
-      <ul>
-        <% @weigh_stations_on_route.each do |w| %>
-          <li>
-            <%= link_to (w.name.presence || "Weigh Station"), weigh_station_path(w) %>
-            <small> — <%= w.state %></small>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p>No weigh stations in this corridor. Try a larger buffer.</p>
-    <% end %>
-  </div>
-
-  <hr>
+<hr>
 <div style="flex:1;">
 <h3>Truck Stops</h3>
 <% if @truck_stops_on_route.present? %>
@@ -107,4 +72,41 @@
   <p>No truck stops in this corridor. Try a larger buffer or different filters.</p>
 <% end %>
 </div>
+  <div style="flex:1;">
+    <h3>Rest Areas</h3>
+    <% if @rest_areas_on_route.present? %>
+      <ul>
+        <% @rest_areas_on_route.each do |r| %>
+          <li>
+            <%= link_to (r.name.presence || "Rest Area"), rest_area_path(r) %>
+            <small>
+              — <%= r.state %> <%= r.highway_route %>
+              <% if r.respond_to?(:mile_post) && r.mile_post.present? %> • MP <%= r.mile_post %><% end %>
+              <% if r.respond_to?(:number_of_spots) && r.number_of_spots.present? %> • Spots: <%= r.number_of_spots %><% end %>
+            </small>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No rest areas in this corridor. Try a larger buffer.</p>
+    <% end %>
+  </div>
+    
+  <div style="flex:1;">
+    <h3>Weigh Stations</h3>
+    <% if @weigh_stations_on_route.present? %>
+      <ul>
+        <% @weigh_stations_on_route.each do |w| %>
+          <li>
+            <%= link_to (w.name.presence || "Weigh Station"), weigh_station_path(w) %>
+            <small> — <%= w.state %></small>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No weigh stations in this corridor. Try a larger buffer.</p>
+    <% end %>
+  </div>
+
+
 </div>
