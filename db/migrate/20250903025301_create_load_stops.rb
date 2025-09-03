@@ -7,5 +7,7 @@ class CreateLoadStops < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+     add_index :load_stops, [:load_id, :stoppable_type, :stoppable_id],
+              unique: true, name: "idx_unique_load_stoppable"
   end
 end
