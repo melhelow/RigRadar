@@ -2,7 +2,7 @@
 #
 # Table name: rest_areas
 #
-#  id              :bigint           not null, primary key
+#  id              :integer          not null, primary key
 #  county          :string
 #  highway_route   :string
 #  lat             :decimal(10, 6)

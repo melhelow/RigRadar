@@ -2,7 +2,7 @@
 #
 # Table name: loads
 #
-#  id               :bigint           not null, primary key
+#  id               :integer          not null, primary key
 #  commodity        :string
 #  deadline         :datetime
 #  dropoff_lat      :decimal(10, 6)
@@ -24,7 +24,7 @@
 #
 # Foreign Keys
 #
-#  fk_rails_...  (driver_id => drivers.id)
+#  driver_id  (driver_id => drivers.id)
 #
 # app/models/load.rb
 class Load < ApplicationRecord
