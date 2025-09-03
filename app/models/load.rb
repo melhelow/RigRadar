@@ -61,4 +61,8 @@ class Load < ApplicationRecord
     Geocoder.search(q).first&.coordinates ||
       Geocoder.search("#{q}, USA").first&.coordinates
   end
+  has_many :load_stops, dependent: :destroy
+  has_many :rest_areas,     through: :load_stops, source: :stoppable, source_type: "RestArea"
+  has_many :weigh_stations, through: :load_stops, source: :stoppable, source_type: "WeighStation"
+  has_many :truck_stops,    through: :load_stops, source: :stoppable, source_type: "TruckStop"
 end
