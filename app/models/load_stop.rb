@@ -23,6 +23,6 @@
 class LoadStop < ApplicationRecord
   belongs_to :load
   belongs_to :stoppable, polymorphic: true
-  validates :load_id, uniqueness: { scope: [:stoppable_type, :stoppable_id] }
+  validates :stoppable_id, uniqueness: { scope: [:load_id, :stoppable_type] }
 
 end
