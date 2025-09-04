@@ -3,7 +3,7 @@
 #
 # Table name: truck_stops
 #
-#  id            :integer          not null, primary key
+#  id            :bigint           not null, primary key
 #  city          :string
 #  country       :string           default("US")
 #  direction_url :text

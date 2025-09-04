@@ -2,7 +2,7 @@
 #
 # Table name: load_stops
 #
-#  id             :integer          not null, primary key
+#  id             :bigint           not null, primary key
 #  position       :integer
 #  stoppable_type :string           not null
 #  created_at     :datetime         not null
@@ -18,7 +18,7 @@
 #
 # Foreign Keys
 #
-#  load_id  (load_id => loads.id)
+#  fk_rails_...  (load_id => loads.id)
 #
 class LoadStop < ApplicationRecord
   belongs_to :load

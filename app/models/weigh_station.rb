@@ -2,7 +2,7 @@
 #
 # Table name: weigh_stations
 #
-#  id              :integer          not null, primary key
+#  id              :bigint           not null, primary key
 #  counts_year     :integer
 #  fips_code       :string
 #  functional      :string
