@@ -1,27 +1,27 @@
 class LoadsController < ApplicationController
   before_action :authenticate_driver!
  
-  before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan, :regeocode, :add_stops, :remove_stop]
-# ...
-def regeocode
-  @load.pickup_location_will_change!
-  @load.dropoff_location_will_change!
-  if @load.save
-    redirect_to plan_load_path(@load), notice: "Coordinates refreshed."
-  else
-    redirect_to @load, alert: "Could not refresh coordinates."
+  before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan,:preplan, :regeocode, :add_stops, :remove_stop]
+
+  def regeocode
+    @load.pickup_location_will_change!
+    @load.dropoff_location_will_change!
+    if @load.save
+      redirect_to plan_load_path(@load), notice: "Coordinates refreshed."
+    else
+      redirect_to @load, alert: "Could not refresh coordinates."
+    end
   end
-end
 
 
   def index
     @loads = current_driver.loads.order(created_at: :desc)
   end
 
-def show
-  @load = current_driver.loads.find(params[:id])
-  @selected_stops = @load.load_stops.includes(:stoppable).order(:created_at)
-end
+  def show
+    @load = current_driver.loads.find(params[:id])
+    @selected_stops = @load.load_stops.includes(:stoppable).order(:created_at)
+  end
 
 
 
@@ -58,112 +58,93 @@ end
     @load.update!(status: :in_transit, started_at: Time.current)
     redirect_to @load, notice: "Load started."
   end
+
   def deliver
     @load.update!(status: :delivered)
     redirect_to @load, notice: "Load delivered."
   end
+
   def drop
     @load.update!(status: :dropped)
     redirect_to @load, notice: "Load dropped."
   end
 
+ def preplan
+    
+    if @load.pickup_lat.blank? || @load.pickup_lon.blank? ||
+       @load.dropoff_lat.blank? || @load.dropoff_lon.blank?
+      redirect_to @load, alert: "Missing coordinates. Edit the load locations and save again." and return
+    end
 
-def plan
-  unless @load.pickup_lat && @load.pickup_lon && @load.dropoff_lat && @load.dropoff_lon
-    redirect_to @load, alert: "Missing coordinates. Edit the load locations and save again." and return
+    buffer = params[:buffer].presence.to_i
+    buffer = 15 if buffer <= 0 || buffer > 50
+
+    corridor = RouteCorridor.new(
+      @load.pickup_lat,  @load.pickup_lon,
+      @load.dropoff_lat, @load.dropoff_lon,
+      buffer_miles: buffer
+    )
+    min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
+
+    ra_lat = RestArea.column_names.include?("lat") ? :lat : :latitude
+    ra_lon = RestArea.column_names.include?("lon") ? :lon : :longitude
+    ws_lat = WeighStation.column_names.include?("lat") ? :lat : :latitude
+    ws_lon = WeighStation.column_names.include?("lon") ? :lon : :longitude
+
+    ra_box = RestArea.where(ra_lat => min_lat..max_lat, ra_lon => min_lon..max_lon)
+    ws_box = WeighStation.where(ws_lat => min_lat..max_lat, ws_lon => min_lon..max_lon)
+    ts_box = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
+
+    @rest_areas_on_route = ra_box.select { |r|
+      lat = r.public_send(ra_lat); lon = r.public_send(ra_lon)
+      lat && lon && corridor.include_point?(lat, lon)
+    }
+
+    @weigh_stations_on_route = ws_box.select { |w|
+      lat = w.public_send(ws_lat); lon = w.public_send(ws_lon)
+      lat && lon && corridor.include_point?(lat, lon)
+    }
+
+    @truck_stops_on_route = ts_box.select { |t|
+      t.latitude && t.longitude && corridor.include_point?(t.latitude, t.longitude)
+    }
+
+    @buffer = buffer
+
+    render :plan 
   end
 
-  buffer = params[:buffer].presence.to_i
-  buffer = 15 if buffer <= 0 || buffer > 50
 
-  corridor = ::RouteCorridor.new(
-    @load.pickup_lat,  @load.pickup_lon,
-    @load.dropoff_lat, @load.dropoff_lon,
-    buffer_miles: buffer
-  )
-  min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
-  ts_box = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
 
-  if params[:providers].present?
-  ts_box = ts_box.where(provider: params[:providers])
-end
-
-min_parking = params[:min_parking].to_i
-if min_parking > 0
-  ts_box = ts_box.where("parking_truck >= ?", min_parking)
-end
-
-@truck_stops_on_route = ts_box.select do |t|
-  t.latitude && t.longitude && corridor.include_point?(t.latitude, t.longitude)
-end
-
-if @truck_stops_on_route.any? && corridor.respond_to?(:progress_miles)
-  @truck_stops_on_route.sort_by! { |t| corridor.progress_miles(t.latitude, t.longitude) }
-end
-
-  # --- Dynamic column detection (handles lat/lon vs latitude/longitude) ---
-  ra_lat_col = RestArea.column_names.include?("lat") ? :lat : :latitude
-  ra_lon_col = RestArea.column_names.include?("lon") ? :lon : :longitude
-
-  ws_lat_col = WeighStation.column_names.include?("lat") ? :lat : :latitude
-  ws_lon_col = WeighStation.column_names.include?("lon") ? :lon : :longitude
-
-  # 1) Coarse filter by bounding box in SQL
-  ra_box = RestArea.where(ra_lat_col => min_lat..max_lat, ra_lon_col => min_lon..max_lon)
-  ws_box = WeighStation.where(ws_lat_col => min_lat..max_lat, ws_lon_col => min_lon..max_lon)
-
-  # 2) Precise filter by distance-to-segment in Ruby
-  @rest_areas_on_route = ra_box.select do |r|
-    lat = r.public_send(ra_lat_col)
-    lon = r.public_send(ra_lon_col)
-    lat && lon && corridor.include_point?(lat, lon)
-  end
-
-  @weigh_stations_on_route = ws_box.select do |w|
-    lat = w.public_send(ws_lat_col)
-    lon = w.public_send(ws_lon_col)
-    lat && lon && corridor.include_point?(lat, lon)
-  end
-
-  @buffer = buffer
-end
-  
-def regeocode
-  @load = current_driver.loads.find(params[:id])
-  @load.pickup_location_will_change!
-  @load.dropoff_location_will_change!
-  if @load.save
-    redirect_to plan_load_path(@load), notice: "Coordinates refreshed."
-  else
-    redirect_to @load, alert: "Could not refresh coordinates."
-  end
-end
 def add_stops
-  @load = current_driver.loads.find(params[:id])
+  selections = Array(params[:selected] || params[:stops])
 
-  tokens = Array(params[:selected].presence || params[:stops]) # supports both names
-  created = 0
-
-  tokens.each do |token|
-    type, sid = token.to_s.split("-", 2)
-    next unless %w[TruckStop RestArea WeighStation].include?(type) && sid.to_i.positive?
+  added = 0
+  selections.each do |token|
+   
+    type, raw_id = token.to_s.split("-", 2)
+    next unless %w[TruckStop RestArea WeighStation].include?(type) && raw_id.to_i.positive?
 
     model = type.constantize
-    stop  = model.find_by(id: sid)
+    stop  = model.find_by(id: raw_id)
     next unless stop
 
+    
     @load.load_stops.find_or_create_by!(stoppable: stop)
-    created += 1
+    added += 1
   end
 
-  redirect_to @load, notice: "#{created} stop#{'s' if created != 1} added to this load."
+  redirect_to @load, notice: "#{added} #{'stop'.pluralize(added)} added to this load."
 end
-
 
 def remove_stop
   ls = @load.load_stops.find_by(id: params[:stop_id])
-  ls&.destroy
-  redirect_to @load, notice: "Stop removed."
+  if ls
+    ls.destroy
+    redirect_to @load, notice: "Stop removed from this load."
+  else
+    redirect_to @load, alert: "Stop not found."
+  end
 end
 
 

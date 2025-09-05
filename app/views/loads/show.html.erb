@@ -27,14 +27,16 @@
 </p>
 
 <p>
-  <%= link_to "Plan route", plan_load_path(@load), class: "btn btn-secondary" %>
-  <%= link_to "Edit", edit_load_path(@load), class: "btn" %>
-  <%= button_to "Delete", load_path(@load), method: :delete, data: { confirm: "Delete this load?" }, class: "btn btn-danger" %>
+  <%= link_to "Edit Load", edit_load_path(@load), class: "btn" %>
+  <%= link_to "pre-plan", preplan_load_path(@load), class: "btn btn-secondary" %>
+  <%= link_to "Back to Loads", loads_path, class: "btn" %>
+  <%= button_to "Delete", load_path(@load), method: :delete,
+        data: { confirm: "Delete this load?" }, class: "btn btn-danger" %>
 </p>
+
 
 <div id="map"></div>
 
-<%# --- Build JSON from the saved stops we loaded in the controller --- %>
 <%
 stops_payload = (@selected_stops || []).map do |ls|
   stop = ls.stoppable

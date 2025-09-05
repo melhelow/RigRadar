@@ -11,15 +11,16 @@ Rails.application.routes.draw do
   # App
   resources :loads do
     member do
-      get   :plan
+      get   :preplan
+      get    :plan, action: :preplan
+      post   :add_stops 
+      delete :remove_stop
       patch :start
       patch :deliver
       patch :drop
       patch :regeocode 
-      post   :add_stops 
-      delete :remove_stop
     end
-    get :plan, on: :member
+ 
   end
   resources :rest_areas,     only: [:index, :show]
   resources :weigh_stations, only: [:index, :show]
