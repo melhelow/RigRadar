@@ -69,6 +69,11 @@
                   <% if truck_stop.opening_hours.present? %> • Hours: <%= truck_stop.opening_hours %><% end %>
                   <% if truck_stop.website.present? %> • <a href="<%= truck_stop.website %>" target="_blank" rel="noopener">Website</a><% end %>
                   <% if truck_stop.direction_url.present? %> • <a href="<%= truck_stop.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
+                  <% if defined?(truck_stop.miles_from_pickup) %>
+                  • <%= number_with_precision(truck_stop.miles_from_pickup, precision: 1) %> mi from pickup
+                  • <%= number_with_precision(truck_stop.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                <% end %>
+
                 </small>
               </label>
             </li>
@@ -94,6 +99,11 @@
                   — <%= rest_area.state %> <%= rest_area.highway_route %>
                   <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
                   <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
+                  <% if defined?(rest_area.miles_from_pickup) %>
+                  • <%= number_with_precision(rest_area.miles_from_pickup, precision: 1) %> mi from pickup
+                  • <%= number_with_precision(rest_area.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                <% end %>
+
                 </small>
               </label>
             </li>
@@ -115,7 +125,13 @@
                 <%= check_box_tag "selected[]", "WeighStation-#{weigh_station.id}",
                   @selected_stop_keys.include?("WeighStation-#{weigh_station.id}") %>
                 <strong><%= weigh_station.name.presence || "Weigh Station" %></strong>
-                <small> — <%= weigh_station.state %></small>
+                <small> — <%= weigh_station.state %>
+                   <% if defined?(weigh_station.miles_from_pickup) %>
+                    • <%= number_with_precision(weigh_station.miles_from_pickup, precision: 1) %> mi from pickup
+                    • <%= number_with_precision(weigh_station.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                  <% end %>
+
+                </small>
               </label>
             </li>
           <% end %>

@@ -92,6 +92,10 @@ def preplan
   )
   min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
 
+  pickup_coords  = [@load.pickup_lat,  @load.pickup_lon]
+  dropoff_coords = [@load.dropoff_lat, @load.dropoff_lon]
+
+
   ra_lat = RestArea.column_names.include?("lat") ? :lat : :latitude
   ra_lon = RestArea.column_names.include?("lon") ? :lon : :longitude
   ws_lat = WeighStation.column_names.include?("lat") ? :lat : :latitude
@@ -113,19 +117,56 @@ def preplan
     ts_scope = ts_scope.where("COALESCE(parking_truck, 0) >= ?", min_parking)
   end
 
-  @rest_areas_on_route = ra_box.select do |r|
-    lat = r.public_send(ra_lat); lon = r.public_send(ra_lon)
-    lat && lon && corridor.include_point?(lat, lon)
+  @rest_areas_on_route = ra_box.filter_map do |rest_area|
+  lat = rest_area.public_send(ra_lat)
+  lon = rest_area.public_send(ra_lon)
+  next unless lat && lon
+  next unless corridor.include_point?(lat, lon)
+
+  miles_from_pickup = Geocoder::Calculations.distance_between(pickup_coords, [lat, lon], units: :mi)
+  miles_to_dropoff  = Geocoder::Calculations.distance_between([lat, lon], dropoff_coords, units: :mi)
+
+  rest_area.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
+  rest_area.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
+  rest_area
+end
+
+
+  @weigh_stations_on_route = ra_box.filter_map do |rest_area|
+  lat = rest_area.public_send(ra_lat)
+  lon = rest_area.public_send(ra_lon)
+  next unless lat && lon
+  next unless corridor.include_point?(lat, lon)
+
+  miles_from_pickup = Geocoder::Calculations.distance_between(pickup_coords, [lat, lon], units: :mi)
+  miles_to_dropoff  = Geocoder::Calculations.distance_between([lat, lon], dropoff_coords, units: :mi)
+
+  rest_area.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
+  rest_area.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
+  rest_area
+end
+
+  @truck_stops_on_route =
+  ts_scope.filter_map do |truck_stop|
+    next unless truck_stop.latitude && truck_stop.longitude
+    next unless corridor.include_point?(truck_stop.latitude, truck_stop.longitude)
+
+    miles_from_pickup = Geocoder::Calculations.distance_between(
+      pickup_coords, [truck_stop.latitude, truck_stop.longitude], units: :mi
+    )
+    miles_to_dropoff = Geocoder::Calculations.distance_between(
+      [truck_stop.latitude, truck_stop.longitude], dropoff_coords, units: :mi
+    )
+
+    # attach computed distances on the fly so the view can read them
+    truck_stop.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
+    truck_stop.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
+    truck_stop
   end
 
-  @weigh_stations_on_route = ws_box.select do |w|
-    lat = w.public_send(ws_lat); lon = w.public_send(ws_lon)
-    lat && lon && corridor.include_point?(lat, lon)
-  end
+# sort by nearest to pickup, optional but nice
+@truck_stops_on_route.sort_by!(&:miles_from_pickup)
 
-  @truck_stops_on_route = ts_scope.select do |t|
-    t.latitude && t.longitude && corridor.include_point?(t.latitude, t.longitude)
-  end
 
   @buffer       = buffer
   @providers    = providers            # echo back to view
@@ -140,10 +181,9 @@ end
 
 
 def add_stops
-  
-  chosen_tokens = Array(params[:selected] || params[:stops]).map(&:to_s)
+  # incoming checkbox values like: "TruckStop-123", "RestArea-45", "WeighStation-1881"
+  chosen_tokens = Array(params[:selected] || params[:stops]).map(&:to_s).uniq
 
-  
   parsed = chosen_tokens.filter_map do |tok|
     if (m = tok.match(/\A(TruckStop|RestArea|WeighStation)-(\d+)\z/))
       [m[1], m[2].to_i] # [type, id]
@@ -154,20 +194,23 @@ def add_stops
 
   added = removed = 0
   LoadStop.transaction do
-    
+    # what’s already saved for this load
     existing = @load.load_stops.pluck(:id, :stoppable_type, :stoppable_id)
-    existing_pairs = existing.map { |(_id, t, sid)| [t, sid] }.to_set
+    existing_pairs = existing.map { |(_id, type, sid)| [type, sid] }.to_set
 
-    
-    to_remove_ids = existing.
-      select { |id, t, sid| !desired.include?([t, sid]) }.
-      map(&:first)
+    # remove anything that’s currently saved but not in the new selection
+    to_remove_ids = existing
+      .select { |id, type, sid| !desired.include?([type, sid]) }
+      .map(&:first)
 
     removed = @load.load_stops.where(id: to_remove_ids).delete_all
 
-    
-    (desired - existing_pairs).each do |(type, sid)|
-      @load.load_stops.create!(stoppable_type: type, stoppable_id: sid)
+    # add only the newly selected items; verify the target exists
+    (desired - existing_pairs).each do |type, sid|
+      stop = type.constantize.find_by(id: sid)
+      next unless stop # skip stale/missing ids instead of raising
+
+      @load.load_stops.find_or_create_by!(stoppable: stop)
       added += 1
     end
   end
@@ -175,6 +218,7 @@ def add_stops
   redirect_to load_path(@load, anchor: "map"),
               notice: "#{added} added, #{removed} removed. Saved your pre-plan."
 end
+
 
 
 def remove_stop
