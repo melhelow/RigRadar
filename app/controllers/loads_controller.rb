@@ -70,56 +70,72 @@ class LoadsController < ApplicationController
     redirect_to @load, notice: "Load dropped."
   end
 
- def preplan
-    
-    if @load.pickup_lat.blank? || @load.pickup_lon.blank? ||
-       @load.dropoff_lat.blank? || @load.dropoff_lon.blank?
-      redirect_to @load, alert: "Missing coordinates. Edit the load locations and save again." and return
-    end
-
-    buffer = params[:buffer].presence.to_i
-    buffer = 15 if buffer <= 0 || buffer > 50
-
-    corridor = RouteCorridor.new(
-      @load.pickup_lat,  @load.pickup_lon,
-      @load.dropoff_lat, @load.dropoff_lon,
-      buffer_miles: buffer
-    )
-    min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
-
-    ra_lat = RestArea.column_names.include?("lat") ? :lat : :latitude
-    ra_lon = RestArea.column_names.include?("lon") ? :lon : :longitude
-    ws_lat = WeighStation.column_names.include?("lat") ? :lat : :latitude
-    ws_lon = WeighStation.column_names.include?("lon") ? :lon : :longitude
-
-    ra_box = RestArea.where(ra_lat => min_lat..max_lat, ra_lon => min_lon..max_lon)
-    ws_box = WeighStation.where(ws_lat => min_lat..max_lat, ws_lon => min_lon..max_lon)
-    ts_box = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
-
-    @rest_areas_on_route = ra_box.select { |r|
-      lat = r.public_send(ra_lat); lon = r.public_send(ra_lon)
-      lat && lon && corridor.include_point?(lat, lon)
-    }
-
-    @weigh_stations_on_route = ws_box.select { |w|
-      lat = w.public_send(ws_lat); lon = w.public_send(ws_lon)
-      lat && lon && corridor.include_point?(lat, lon)
-    }
-
-    @truck_stops_on_route = ts_box.select { |t|
-      t.latitude && t.longitude && corridor.include_point?(t.latitude, t.longitude)
-    }
-
-    @buffer = buffer
-
-    @selected_stop_keys =
-    @load.load_stops.
-    pluck(:stoppable_type, :stoppable_id).
-    map { |t, id| "#{t}-#{id}" }
-
-
-    render :plan 
+def preplan
+  if @load.pickup_lat.blank? || @load.pickup_lon.blank? ||
+     @load.dropoff_lat.blank? || @load.dropoff_lon.blank?
+    redirect_to @load, alert: "Missing coordinates. Edit the load locations and save again." and return
   end
+
+  buffer = params[:buffer].presence.to_i
+  buffer = 15 if buffer <= 0 || buffer > 50
+
+  # read filters
+  providers   = Array(params[:providers]).reject(&:blank?)
+  providers_n = providers.map { |p| p.to_s.downcase.strip } # normalized
+  min_parking = params[:min_parking].presence&.to_i
+  min_parking = nil if min_parking && min_parking <= 0
+
+  corridor = RouteCorridor.new(
+    @load.pickup_lat,  @load.pickup_lon,
+    @load.dropoff_lat, @load.dropoff_lon,
+    buffer_miles: buffer
+  )
+  min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
+
+  ra_lat = RestArea.column_names.include?("lat") ? :lat : :latitude
+  ra_lon = RestArea.column_names.include?("lon") ? :lon : :longitude
+  ws_lat = WeighStation.column_names.include?("lat") ? :lat : :latitude
+  ws_lon = WeighStation.column_names.include?("lon") ? :lon : :longitude
+
+  ra_box = RestArea.where(ra_lat => min_lat..max_lat, ra_lon => min_lon..max_lon)
+  ws_box = WeighStation.where(ws_lat => min_lat..max_lat, ws_lon => min_lon..max_lon)
+
+  # base scope inside corridor bbox
+  ts_scope = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
+
+  # provider filter (case/space-insensitive)
+  if providers_n.any?
+    ts_scope = ts_scope.where("LOWER(TRIM(provider)) IN (?)", providers_n)
+  end
+
+  # parking filter (treat nil as 0 so it gets excluded when min_parking present)
+  if min_parking
+    ts_scope = ts_scope.where("COALESCE(parking_truck, 0) >= ?", min_parking)
+  end
+
+  @rest_areas_on_route = ra_box.select do |r|
+    lat = r.public_send(ra_lat); lon = r.public_send(ra_lon)
+    lat && lon && corridor.include_point?(lat, lon)
+  end
+
+  @weigh_stations_on_route = ws_box.select do |w|
+    lat = w.public_send(ws_lat); lon = w.public_send(ws_lon)
+    lat && lon && corridor.include_point?(lat, lon)
+  end
+
+  @truck_stops_on_route = ts_scope.select do |t|
+    t.latitude && t.longitude && corridor.include_point?(t.latitude, t.longitude)
+  end
+
+  @buffer       = buffer
+  @providers    = providers            # echo back to view
+  @min_parking  = min_parking
+  @selected_stop_keys =
+    @load.load_stops.pluck(:stoppable_type, :stoppable_id).map { |t,id| "#{t}-#{id}" }
+
+  render :plan
+end
+
 
 
 

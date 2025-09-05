@@ -5,7 +5,8 @@
   <strong>Drop-off:</strong> <%= @load.dropoff_location %>
 </p>
 
-<%= form_with url: plan_load_path(@load), method: :get, local: true do %>
+<%= form_with url: preplan_load_path(@load), method: :get, local: true do %>
+
   <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
     <div>
       <label>Buffer (miles):</label>
@@ -14,22 +15,16 @@
 
     <div>
       <label>Min Truck Parking</label>
-      <%= number_field_tag :min_parking, params[:min_parking], min: 0, step: 1, placeholder: "e.g. 20" %>
+      
+      <%= number_field_tag :min_parking, (@min_parking || params[:min_parking]), min: 0, step: 1 %>
+
     </div>
 
     <div>
       <label>Providers</label><br>
-      <% [
-        ["Love's","Love's"],
-        ["Pilot","Pilot"],
-        ["Flying J","Flying J"],
-        ["TA","TA"],
-        ["Petro","Petro"],
-        ["AMBEST","AMBEST"],
-        ["Pilot Flying J","Pilot Flying J"]
-      ].each do |label, value| %>
-        <label style="margin-right:.5rem;">
-          <%= check_box_tag "providers[]", value, Array(params[:providers]).include?(value) %> <%= label %>
+    <% [["Love's","Love's"],["Pilot","Pilot"],["Flying J","Flying J"],["TA","TA"],["Petro","Petro"],["AMBEST","AMBEST"],["Pilot Flying J","Pilot Flying J"]].each do |label, value| %>
+  <label style="margin-right:.5rem;">
+    <%= check_box_tag "providers[]", value, Array(@providers || params[:providers]).include?(value) %> <%= label %>
         </label>
       <% end %>
     </div>
