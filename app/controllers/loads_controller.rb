@@ -19,10 +19,38 @@ class LoadsController < ApplicationController
     @loads = current_driver.loads.order(created_at: :desc)
   end
 
-  def show
-    @load = current_driver.loads.find(params[:id])
-    @selected_stops = @load.load_stops.includes(:stoppable).order(:created_at)
+def show
+  @load = current_driver.loads.find(params[:id])
+  @selected_stops = @load.load_stops.includes(:stoppable).order(:created_at)
+
+  # build weigh stations for the map + read-only list
+  buffer = params[:buffer].presence.to_i
+  buffer = 15 if buffer <= 0 || buffer > 50
+  @buffer = buffer
+
+  if @load.pickup_lat && @load.pickup_lon && @load.dropoff_lat && @load.dropoff_lon
+    corridor = RouteCorridor.new(
+      @load.pickup_lat,  @load.pickup_lon,
+      @load.dropoff_lat, @load.dropoff_lon,
+      buffer_miles: buffer
+    )
+    min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
+
+    ws_lat = WeighStation.column_names.include?("lat") ? :lat : :latitude
+    ws_lon = WeighStation.column_names.include?("lon") ? :lon : :longitude
+
+    ws_box = WeighStation.where(ws_lat => min_lat..max_lat, ws_lon => min_lon..max_lon)
+    @weigh_stations_on_route = ws_box.select do |ws|
+      lat = ws.public_send(ws_lat)
+      lon = ws.public_send(ws_lon)
+      lat && lon && corridor.include_point?(lat, lon)
+    end
+  else
+    @weigh_stations_on_route = []
   end
+
+
+end
 
 
 
@@ -181,42 +209,62 @@ end
 
 
 def add_stops
-  # incoming checkbox values like: "TruckStop-123", "RestArea-45", "WeighStation-1881"
-  chosen_tokens = Array(params[:selected] || params[:stops]).map(&:to_s).uniq
+  chosen_tokens = Array(params[:selected] || params[:stops]).map(&:to_s)
+  # Ignore weigh stations – they’re auto-included/read-only
+  chosen_tokens.reject! { |tok| tok.start_with?("WeighStation-") }
 
   parsed = chosen_tokens.filter_map do |tok|
     if (m = tok.match(/\A(TruckStop|RestArea|WeighStation)-(\d+)\z/))
-      [m[1], m[2].to_i] # [type, id]
+      [m[1], m[2].to_i]
     end
   end
 
   desired = parsed.to_set
-
   added = removed = 0
+
   LoadStop.transaction do
-    # what’s already saved for this load
     existing = @load.load_stops.pluck(:id, :stoppable_type, :stoppable_id)
     existing_pairs = existing.map { |(_id, type, sid)| [type, sid] }.to_set
 
-    # remove anything that’s currently saved but not in the new selection
-    to_remove_ids = existing
-      .select { |id, type, sid| !desired.include?([type, sid]) }
-      .map(&:first)
-
+    to_remove_ids = existing.select { |id, type, sid| !desired.include?([type, sid]) }.map(&:first)
     removed = @load.load_stops.where(id: to_remove_ids).delete_all
 
-    # add only the newly selected items; verify the target exists
-    (desired - existing_pairs).each do |type, sid|
-      stop = type.constantize.find_by(id: sid)
-      next unless stop # skip stale/missing ids instead of raising
-
-      @load.load_stops.find_or_create_by!(stoppable: stop)
+    (desired - existing_pairs).each do |(type, stoppable_id)|
+      @load.load_stops.create!(stoppable_type: type, stoppable_id: stoppable_id)
       added += 1
     end
   end
 
   redirect_to load_path(@load, anchor: "map"),
               notice: "#{added} added, #{removed} removed. Saved your pre-plan."
+
+  # --- Auto-attach weigh stations on the current corridor ---
+buffer = params[:buffer].to_i
+buffer = 15 if buffer <= 0 || buffer > 50
+
+if @load.pickup_lat && @load.pickup_lon && @load.dropoff_lat && @load.dropoff_lon
+  corridor = RouteCorridor.new(
+    @load.pickup_lat,  @load.pickup_lon,
+    @load.dropoff_lat, @load.dropoff_lon,
+    buffer_miles: buffer
+  )
+  min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
+
+  ws_lat = WeighStation.column_names.include?("lat") ? :lat : :latitude
+  ws_lon = WeighStation.column_names.include?("lon") ? :lon : :longitude
+
+  ws_candidates = WeighStation.where(ws_lat => min_lat..max_lat, ws_lon => min_lon..max_lon)
+  ws_on_route = ws_candidates.select do |weigh_station|
+    lat = weigh_station.public_send(ws_lat)
+    lon = weigh_station.public_send(ws_lon)
+    lat && lon && corridor.include_point?(lat, lon)
+  end
+
+  ws_on_route.each do |weigh_station|
+    @load.load_stops.find_or_create_by!(stoppable: weigh_station)
+  end
+end
+
 end
 
 
