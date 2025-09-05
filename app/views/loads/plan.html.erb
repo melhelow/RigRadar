@@ -65,7 +65,8 @@
           <% @truck_stops_on_route.each do |truck_stop| %>
             <li style="margin:.4rem 0;">
               <label>
-                <%= check_box_tag "selected[]", "TruckStop-#{truck_stop.id}" %>
+                <%= check_box_tag "selected[]", "TruckStop-#{truck_stop.id}",
+                  @selected_stop_keys.include?("TruckStop-#{truck_stop.id}") %>
                 <strong><%= truck_stop.name %></strong> <%= provider_badge(truck_stop.provider) %><br>
                 <small>
                   <%= [truck_stop.street, truck_stop.city, truck_stop.state, truck_stop.zip_code].compact.join(", ") %>
@@ -91,7 +92,8 @@
           <% @rest_areas_on_route.each do |rest_area| %>
             <li>
               <label>
-                <%= check_box_tag "selected[]", "RestArea-#{rest_area.id}" %>
+                <%= check_box_tag "selected[]", "RestArea-#{rest_area.id}",
+                  @selected_stop_keys.include?("RestArea-#{rest_area.id}") %>
                 <strong><%= rest_area.name.presence || "Rest Area" %></strong>
                 <small>
                   — <%= rest_area.state %> <%= rest_area.highway_route %>
@@ -107,7 +109,7 @@
       <% end %>
     </div>
 
-    <!-- Weigh Stations -->
+    
     <div style="flex:1; min-width:280px;">
       <h3>Weigh Stations</h3>
       <% if @weigh_stations_on_route.present? %>
@@ -115,7 +117,8 @@
           <% @weigh_stations_on_route.each do |weigh_station| %>
             <li>
               <label>
-                <%= check_box_tag "selected[]", "WeighStation-#{weigh_station.id}" %>
+                <%= check_box_tag "selected[]", "WeighStation-#{weigh_station.id}",
+                  @selected_stop_keys.include?("WeighStation-#{weigh_station.id}") %>
                 <strong><%= weigh_station.name.presence || "Weigh Station" %></strong>
                 <small> — <%= weigh_station.state %></small>
               </label>

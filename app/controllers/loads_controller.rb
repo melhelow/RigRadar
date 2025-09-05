@@ -1,4 +1,5 @@
 class LoadsController < ApplicationController
+   require "set"
   before_action :authenticate_driver!
  
   before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan,:preplan, :regeocode, :add_stops, :remove_stop]
@@ -111,31 +112,54 @@ class LoadsController < ApplicationController
 
     @buffer = buffer
 
+    @selected_stop_keys =
+    @load.load_stops.
+    pluck(:stoppable_type, :stoppable_id).
+    map { |t, id| "#{t}-#{id}" }
+
+
     render :plan 
   end
 
 
 
 def add_stops
-  selections = Array(params[:selected] || params[:stops])
+  
+  chosen_tokens = Array(params[:selected] || params[:stops]).map(&:to_s)
 
-  added = 0
-  selections.each do |token|
-   
-    type, raw_id = token.to_s.split("-", 2)
-    next unless %w[TruckStop RestArea WeighStation].include?(type) && raw_id.to_i.positive?
-
-    model = type.constantize
-    stop  = model.find_by(id: raw_id)
-    next unless stop
-
-    
-    @load.load_stops.find_or_create_by!(stoppable: stop)
-    added += 1
+  
+  parsed = chosen_tokens.filter_map do |tok|
+    if (m = tok.match(/\A(TruckStop|RestArea|WeighStation)-(\d+)\z/))
+      [m[1], m[2].to_i] # [type, id]
+    end
   end
 
-  redirect_to @load, notice: "#{added} #{'stop'.pluralize(added)} added to this load."
+  desired = parsed.to_set
+
+  added = removed = 0
+  LoadStop.transaction do
+    
+    existing = @load.load_stops.pluck(:id, :stoppable_type, :stoppable_id)
+    existing_pairs = existing.map { |(_id, t, sid)| [t, sid] }.to_set
+
+    
+    to_remove_ids = existing.
+      select { |id, t, sid| !desired.include?([t, sid]) }.
+      map(&:first)
+
+    removed = @load.load_stops.where(id: to_remove_ids).delete_all
+
+    
+    (desired - existing_pairs).each do |(type, sid)|
+      @load.load_stops.create!(stoppable_type: type, stoppable_id: sid)
+      added += 1
+    end
+  end
+
+  redirect_to load_path(@load, anchor: "map"),
+              notice: "#{added} added, #{removed} removed. Saved your pre-plan."
 end
+
 
 def remove_stop
   ls = @load.load_stops.find_by(id: params[:stop_id])
