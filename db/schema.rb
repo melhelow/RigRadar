@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_01_220347) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_03_025301) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_220347) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_drivers_on_email", unique: true
     t.index ["reset_password_token"], name: "index_drivers_on_reset_password_token", unique: true
+  end
+
+  create_table "load_stops", force: :cascade do |t|
+    t.integer "load_id", null: false
+    t.string "stoppable_type", null: false
+    t.integer "stoppable_id", null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["load_id", "stoppable_type", "stoppable_id"], name: "idx_unique_load_stoppable", unique: true
+    t.index ["load_id"], name: "index_load_stops_on_load_id"
+    t.index ["stoppable_type", "stoppable_id"], name: "index_load_stops_on_stoppable"
   end
 
   create_table "loads", force: :cascade do |t|
@@ -255,6 +267,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_01_220347) do
     t.index ["station_uid"], name: "index_weigh_stations_on_station_uid", unique: true
   end
 
+  add_foreign_key "load_stops", "loads"
   add_foreign_key "loads", "drivers"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

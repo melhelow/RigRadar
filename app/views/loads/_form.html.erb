@@ -1,8 +1,34 @@
-<%= form_with model: @load do |f| %>
-  <p><%= f.label :commodity %><br><%= f.text_field :commodity %></p>
-  <p><%= f.label :weight_lbs %><br><%= f.number_field :weight_lbs %></p>
-  <p><%= f.label :pickup_location %><br><%= f.text_field :pickup_location, placeholder: "Des Moines, IA" %></p>
-  <p><%= f.label :dropoff_location %><br><%= f.text_field :dropoff_location, placeholder: "Chicago, IL" %></p>
-  <p><%= f.label :deadline %><br><%= f.datetime_field :deadline %></p>
-  <p><%= f.submit %></p>
+<%= form_with(model: @load, local: true) do |f| %>
+  <% if @load.errors.any? %>
+    <div class="alert"><%= @load.errors.full_messages.to_sentence %></div>
+  <% end %>
+
+  <div>
+    <%= f.label :commodity %><br>
+    <%= f.text_field :commodity, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :weight_lbs, "Weight (lbs)" %><br>
+    <%= f.number_field :weight_lbs, min: 0, step: 100, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :pickup_location %><br>
+    <%= f.text_field :pickup_location, placeholder: "City, ST or address", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :dropoff_location %><br>
+    <%= f.text_field :dropoff_location, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :deadline %><br>
+    <%= f.datetime_local_field :deadline %>
+  </div>
+
+  <div style="margin-top:.5rem;">
+    <%= f.submit %>
+  </div>
 <% end %>
