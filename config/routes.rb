@@ -8,17 +8,17 @@ Rails.application.routes.draw do
   get "rest_areas/show"
   devise_for :drivers
 
-  # App
+  
   resources :loads do
     member do
       get   :preplan
-      get    :plan, action: :preplan
-      post   :add_stops 
+      get   :plan, action: :preplan
+      post  :add_stops 
       delete :remove_stop
-      patch :start
-      patch :deliver
-      patch :drop
-      patch :regeocode 
+      post :start
+      post :deliver
+      post :drop
+      post :regeocode 
     end
  
   end
@@ -26,9 +26,9 @@ Rails.application.routes.draw do
   resources :weigh_stations, only: [:index, :show]
   resources :truck_stops,     only: [:index, :show]
 
-  # Public pages
+
   get "about", to: "pages#about"
 
-  # Landing is always root
+
   root "pages#home"
 end
