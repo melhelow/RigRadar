@@ -1,51 +1,37 @@
-<%# --- Leaflet + small map height --- %>
+<%# Leaflet includes %>
 <% content_for :head do %>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
-  <style>
-    #map { height: 260px; border-radius: 12px; margin: .75rem 0 1rem; }
-  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <style>#map{height:260px;border-radius:12px;margin:.75rem 0 1rem;}</style>
 <% end %>
 
-<h1>Load <%= @load.id %></h1>
+<h1 id="map" class="mb-3">Load <%= @load.id %></h1>
 
-<p>
-  <strong>Commodity:</strong> <%= @load.commodity %><br>
-  <strong>Weight (lbs):</strong> <%= @load.weight_lbs %><br>
+<p class="text-muted">
+  <strong>Commodity:</strong> <%= @load.commodity %> ·
+  <strong>Weight:</strong> <%= number_with_delimiter(@load.weight_lbs) %> lbs<br>
   <strong>Pickup:</strong> <%= @load.pickup_location %><br>
   <strong>Drop-off:</strong> <%= @load.dropoff_location %><br>
   <strong>Status:</strong> <%= @load.status.humanize %>
 </p>
 
-<p>
-  <%= link_to "Edit Load", edit_load_path(@load), class: "btn" %>
-  <%= link_to "pre-plan", preplan_load_path(@load), class: "btn btn-secondary" %>
-  <%= link_to "Back to Loads", loads_path, class: "btn" %>
-  <%= button_to "Delete", load_path(@load), method: :delete,
-        data: { confirm: "Delete this load?" }, class: "btn btn-danger" %>
-</p>
-
+<div class="d-flex gap-2 mb-3">
+  <%= link_to "Edit pre-plan", preplan_load_path(@load), class: "btn btn-secondary btn-sm" %>
+  <%= link_to "Edit load", edit_load_path(@load), class: "btn btn-outline-secondary btn-sm" %>
+  <%= link_to "Back to Loads", loads_path, class: "btn btn-outline-primary btn-sm" %>
+  <%= button_to "Delete", @load, method: :delete, data: { turbo_confirm: "Delete this load?" }, class: "btn btn-danger btn-sm" %>
+</div>
 
 <div id="map"></div>
 
 <%
-stops_payload = (@selected_stops || []).map do |ls|
-  stop = ls.stoppable
+stops_payload = (@selected_stops || []).map do |load_stop|
+  stop = load_stop.stoppable
   lat  = stop.try(:latitude) || stop.try(:lat)
   lon  = stop.try(:longitude) || stop.try(:lon)
   next unless lat && lon
-
   {
-    id: ls.id,
+    id: load_stop.id,
     type: stop.class.name,
     name: (stop.try(:name).presence || (stop.is_a?(RestArea) ? "Rest Area" : stop.is_a?(WeighStation) ? "Weigh Station" : "Stop")),
     lat: lat, lon: lon,
@@ -57,24 +43,19 @@ end.compact
 %>
 
 <script nonce="<%= content_security_policy_nonce %>">
-  function initLoadShowMap() {
+  function initLoadShowMap(){
     const el = document.getElementById("map");
-    if (!el || el.dataset.initialized) return;
-    if (!window.L) return; // Leaflet not ready
-    el.dataset.initialized = "1";
+    if(!el || el.dataset.initialized) return;
+    if(!window.L) { setTimeout(initLoadShowMap,100); return; }
+    el.dataset.initialized="1";
 
     const pickup  = [<%= @load.pickup_lat  || 'null' %>, <%= @load.pickup_lon  || 'null' %>];
     const dropoff = [<%= @load.dropoff_lat || 'null' %>, <%= @load.dropoff_lon || 'null' %>];
 
-    if (!pickup[0] || !dropoff[0]) {
-      el.innerHTML = "<div style='padding:.5rem;color:#666'>No coordinates on this load yet.</div>";
-      return;
-    }
+    if(!pickup[0] || !dropoff[0]) { el.innerHTML = "<div class='text-muted'>No coordinates on this load yet.</div>"; return; }
 
     const map = L.map(el).setView([(pickup[0]+dropoff[0])/2.0, (pickup[1]+dropoff[1])/2.0], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
 
     const m1 = L.marker(pickup).addTo(map).bindPopup("Pickup: <%= j @load.pickup_location %>");
     const m2 = L.marker(dropoff).addTo(map).bindPopup("Drop-off: <%= j @load.dropoff_location %>");
@@ -82,79 +63,66 @@ end.compact
     map.fitBounds(line.getBounds().pad(0.25));
 
     const savedStops = <%= raw stops_payload.to_json %>;
-    const colorByType = (t) => t === "TruckStop" ? "blue" : (t === "RestArea" ? "green" : "red");
-
-    savedStops.forEach(s => {
-      L.circleMarker([s.lat, s.lon], {radius: 6, color: colorByType(s.type)})
+    const colorByType = (t) => t==="TruckStop"?"blue":(t==="RestArea"?"green":"red");
+    savedStops.forEach(s=>{
+      L.circleMarker([s.lat,s.lon],{radius:6,color:colorByType(s.type)})
         .addTo(map)
-        .bindPopup(`<strong>${s.name}</strong><br>${s.address || ""}<br><a href="${s.url}">View</a>`);
+        .bindPopup(`<strong>${s.name}</strong><br>${s.address||""}<br><a href="${s.url}">View</a>`);
     });
   }
-
-  function waitForLeafletThenInit(tries = 0) {
-    if (window.L) return initLoadShowMap();
-    if (tries > 40) return console.warn("Leaflet never loaded");
-    setTimeout(() => waitForLeafletThenInit(tries + 1), 100);
-  }
-
-  document.addEventListener("turbo:load",  () => waitForLeafletThenInit());
-  document.addEventListener("turbo:render", () => waitForLeafletThenInit());
-  document.addEventListener("DOMContentLoaded", () => waitForLeafletThenInit());
+  document.addEventListener("turbo:load", initLoadShowMap);
+  document.addEventListener("turbo:render", initLoadShowMap);
+  document.addEventListener("DOMContentLoaded", initLoadShowMap);
 </script>
 
 <hr>
 
 <h3>Saved Stops for This Load</h3>
-
 <% if @selected_stops.present? %>
-  <ul>
-    <% @selected_stops.each do |ls| %>
-      <% s = ls.stoppable %>
-      <li style="margin:.4rem 0;">
-        <% if ls.stoppable_type == "TruckStop" %>
-          <strong><%= s.name %></strong>
-          <% if s.respond_to?(:provider) && s.provider.present? %>
-            <span style="border:1px solid #ddd; border-radius:6px; padding:2px 6px; font-size:.8rem; margin-left:.25rem;">
-              <%= s.provider %>
-            </span>
+  <ul class="list-unstyled">
+    <% @selected_stops.each do |load_stop| %>
+      <% stop = load_stop.stoppable %>
+      <li class="mb-2">
+        <% if load_stop.stoppable_type == "TruckStop" %>
+          <strong><%= stop.name %></strong>
+          <% if stop.respond_to?(:provider) && stop.provider.present? %>
+            <span class="badge bg-info-subtle text-dark border"><%= stop.provider %></span>
           <% end %>
-          <small>
-            <% parts = [s.try(:street), s.try(:city), s.try(:state), s.try(:zip_code)].compact.reject(&:blank?) %>
+          <small class="text-muted">
+            <% parts = [stop.try(:street), stop.try(:city), stop.try(:state), stop.try(:zip_code)].compact.reject(&:blank?) %>
             <% if parts.any? %> — <%= parts.join(", ") %><% end %>
-            <% if s.try(:parking_truck).present? %> • Truck parking: <%= s.parking_truck %><% end %>
-            <% if s.try(:opening_hours).present? %> • Hours: <%= s.opening_hours %><% end %>
-            <% if s.try(:website).present? %> • <a href="<%= s.website %>" target="_blank" rel="noopener">Website</a><% end %>
-            <% if s.try(:direction_url).present? %> • <a href="<%= s.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
           </small>
-        <% elsif ls.stoppable_type == "RestArea" %>
-          <strong><%= s.try(:name).presence || "Rest Area" %></strong>
-          <small>
+
+        <% elsif load_stop.stoppable_type == "RestArea" %>
+          <strong><%= stop.try(:name).presence || "Rest Area" %></strong>
+          <small class="text-muted">
             <% bits = [] %>
-            <% bits << s.try(:state) if s.respond_to?(:state) %>
-            <% bits << s.try(:highway_route) if s.respond_to?(:highway_route) %>
-            <% bits << "MP #{s.mile_post}" if s.respond_to?(:mile_post) && s.mile_post.present? %>
-            <% bits << "Spots: #{s.number_of_spots}" if s.respond_to?(:number_of_spots) && s.number_of_spots.present? %>
+            <% bits << stop.try(:state) if stop.respond_to?(:state) %>
+            <% bits << stop.try(:highway_route) if stop.respond_to?(:highway_route) %>
+            <% bits << "MP #{stop.mile_post}" if stop.respond_to?(:mile_post) && stop.mile_post.present? %>
+            <% bits << "Spots: #{stop.number_of_spots}" if stop.respond_to?(:number_of_spots) && stop.number_of_spots.present? %>
             <% if bits.any? %> — <%= bits.join(" • ") %><% end %>
           </small>
+
         <% else %> <%# WeighStation %>
-          <strong><%= s.try(:name).presence || "Weigh Station" %></strong>
-          <small>
+          <strong><%= stop.try(:name).presence || "Weigh Station" %></strong>
+          <small class="text-muted">
             <% wsbits = [] %>
-            <% wsbits << s.try(:state) if s.respond_to?(:state) %>
-            <% wsbits << s.try(:functional) if s.respond_to?(:functional) %>
+            <% wsbits << stop.try(:state) if stop.respond_to?(:state) %>
+            <% wsbits << stop.try(:functional) if stop.respond_to?(:functional) %>
             <% if wsbits.any? %> — <%= wsbits.join(" • ") %><% end %>
           </small>
         <% end %>
 
-        <%= button_to "Remove",
-                      remove_stop_load_path(@load, stop_id: ls.id),
-                      method: :delete,
-                      form: { style: "display:inline" },
-                      class: "btn btn-link",
-                      data: { confirm: "Remove this stop from the load?" } %>
+        <%# Only allow removing if it’s not a weigh station (since they’re auto-included) %>
+        <% unless load_stop.stoppable_type == "WeighStation" %>
+          <%= button_to "Remove", remove_stop_load_path(@load, stop_id: load_stop.id),
+                method: :delete, form: { style: "display:inline" },
+                class: "btn btn-link btn-sm", data: { turbo_confirm: "Remove this stop?" } %>
+        <% end %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <p>No stops saved yet. Go to <%= link_to "Plan route", plan_load_path(@load) %> to add some.</p>
+  <p class="text-muted">No stops saved yet. Go to <%= link_to "Edit pre-plan", preplan_load_path(@load) %>.</p>
 <% end %>
