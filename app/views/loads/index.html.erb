@@ -1,15 +1,39 @@
+<h1 class="mb-3">Your Loads</h1>
+<p><%= link_to "New Load", new_load_path, class: "btn btn-primary btn-sm" %></p>
 
-<h1>Your Loads</h1>
-<p><%= link_to "New Load", new_load_path %></p>
-
-<ul>
-  <% @loads.each do |load| %>
-    <li>
-      <%= link_to "Load ##{load.id} - #{load.commodity}", load %> (<%= load.status %>)
-      — <%= link_to "Edit pre-plan", preplan_load_path(load), class: "btn btn-secondary" %>
-      <%= link_to "Planned route", load_path(load, anchor: "map"), class: "btn" %>
-      — <%= button_to "Delete", load_path(load), method: :delete, form: { style: "display:inline" },
-            data: { turbo_confirm: "Delete Load ##{load.id}?" } %>
-    </li>
-  <% end %>
-</ul>
+<% if @loads.any? %>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Commodity</th>
+          <th>Pickup → Drop-off</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @loads.each do |l| %>
+          <tr>
+            <td><%= link_to "##{l.id}", l %></td>
+            <td><%= l.commodity %> · <%= number_with_delimiter(l.weight_lbs) %> lbs</td>
+            <td><%= l.pickup_location %> → <%= l.dropoff_location %></td>
+            <td><span class="badge bg-secondary"><%= l.status.humanize %></span></td>
+            <td class="text-end">
+              <%= link_to "Planned route", load_path(l, anchor: "map"), class: "btn btn-outline-primary btn-sm" %>
+              <%= link_to "Edit pre-plan", preplan_load_path(l), class: "btn btn-secondary btn-sm" %>
+              <%= link_to "Edit load", edit_load_path(l), class: "btn btn-outline-secondary btn-sm" %>
+              <%= button_to "Delete", l, method: :delete,
+                    class: "btn btn-danger btn-sm",
+                    form: { style: "display:inline" },
+                    data: { turbo_confirm: "Delete Load ##{l.id}?" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p>No loads yet.</p>
+<% end %>
