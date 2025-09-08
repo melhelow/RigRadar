@@ -26,8 +26,8 @@
                     
                     <% if defined?(truck_stop.miles_from_pickup) %>
                       <span class="text-danger fw-semibold">
-                        • <%= number_with_precision(truck_stop.miles_from_pickup, precision: 1) %> mi from pickup
-                        • <%= number_with_precision(truck_stop.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                        <%= number_with_precision(truck_stop.miles_from_pickup, precision: 1) %> mi from pickup
+                       <%= number_with_precision(truck_stop.miles_to_dropoff,  precision: 1) %> mi to drop-off
                       </span>
                     <% end %>
 
@@ -58,14 +58,14 @@
                     <span class="fw-semibold"><%= rest_area.name.presence || "Rest Area" %></span>
                   </div>
                   <div class="small text-muted mt-1">
-                    — <%= rest_area.state %> <%= rest_area.highway_route %>
+                    <%= rest_area.state %> <%= rest_area.highway_route %>
                     <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
                     <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
 
                        <% if defined?(rest_area.miles_from_pickup) %>
                         <span class="text-danger fw-semibold">
-                          • <%= number_with_precision(rest_area.miles_from_pickup, precision: 1) %> mi from pickup
-                          • <%= number_with_precision(rest_area.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                          <%= number_with_precision(rest_area.miles_from_pickup, precision: 1) %> mi from pickup
+                         <%= number_with_precision(rest_area.miles_to_dropoff,  precision: 1) %> mi to drop-off
                         </span>
                       <% end %>
 
@@ -83,7 +83,7 @@
 
     <div class="col">
       <div class="card card-soft h-100">
-        <div class="card-header fw-semibold">Weigh Stations (auto-included)</div>
+        <div class="card-header fw-semibold">Weigh Stations</div>
         <div class="card-body">
           <% if @weigh_stations_on_route.present? %>
             <div class="list-group">
@@ -91,11 +91,11 @@
                 <div class="list-group-item">
                   <strong><%= weigh_station.name.presence || "Weigh Station" %></strong>
                   <div class="small text-muted mt-1">
-                    — <%= weigh_station.state %>
+                     <%= weigh_station.state %>
                     <% if defined?(weigh_station.miles_from_pickup) %>
                     <span class="text-danger fw-semibold">
-                      • <%= number_with_precision(weigh_station.miles_from_pickup, precision: 1) %> mi from pickup
-                      • <%= number_with_precision(weigh_station.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                      <%= number_with_precision(weigh_station.miles_from_pickup, precision: 1) %> mi from pickup
+                      <%= number_with_precision(weigh_station.miles_to_dropoff,  precision: 1) %> mi to drop-off
                     </span>
                   <% end %>
 
