@@ -1,28 +1,126 @@
-<%# Leaflet includes %>
+<%# Leaflet includes (small map) %>
 <% content_for :head do %>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-  <style>#map{height:260px;border-radius:12px;margin:.75rem 0 1rem;}</style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <style>#map{ height: 420px; border-radius: .75rem; }</style>
 <% end %>
 
-<h1 id="map" class="mb-3">Load <%= @load.id %></h1>
+<% content_for :hero do %>
+  <section class="hero py-5">
+    <div class="container">
+      <div class="row g-3 align-items-center">
+        <div class="col-lg-8">
+          <h1 class="display-6 mb-2">Planned Route · Load <%= @load.id %></h1>
+          <div class="text-white-50">
+            <span class="badge badge-status me-2"><%= @load.status.humanize %></span>
+            <strong>Pickup:</strong> <%= @load.pickup_location %> ·
+            <strong>Drop-off:</strong> <%= @load.dropoff_location %>
+          </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <div class="btn-group">
+            <%= link_to "Edit pre-plan", plan_load_path(@load), class: "btn btn-rr btn-sm" %>
+            <%= link_to "Edit load", edit_load_path(@load), class: "btn btn-outline-light btn-sm" %>
+            <%= link_to "Back to Loads", loads_path, class: "btn btn-light btn-sm" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<% end %>
 
-<p class="text-muted">
-  <strong>Commodity:</strong> <%= @load.commodity %> ·
-  <strong>Weight:</strong> <%= number_with_delimiter(@load.weight_lbs) %> lbs<br>
-  <strong>Pickup:</strong> <%= @load.pickup_location %><br>
-  <strong>Drop-off:</strong> <%= @load.dropoff_location %><br>
-  <strong>Status:</strong> <%= @load.status.humanize %>
-</p>
-
-<div class="d-flex gap-2 mb-3">
-  <%= link_to "Edit pre-plan", preplan_load_path(@load), class: "btn btn-secondary btn-sm" %>
-  <%= link_to "Edit load", edit_load_path(@load), class: "btn btn-outline-secondary btn-sm" %>
-  <%= link_to "Back to Loads", loads_path, class: "btn btn-outline-primary btn-sm" %>
-  <%= button_to "Delete", @load, method: :delete, data: { turbo_confirm: "Delete this load?" }, class: "btn btn-danger btn-sm" %>
+<%# Summary data card on top %>
+<div class="card card-soft mb-3">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="small text-muted">Commodity</div>
+        <div class="fw-semibold"><%= @load.commodity %></div>
+      </div>
+      <div class="col-md-3">
+        <div class="small text-muted">Weight</div>
+        <div class="fw-semibold"><%= @load.weight_lbs %> lbs</div>
+      </div>
+      <div class="col-md-3">
+        <div class="small text-muted">Pickup</div>
+        <div class="fw-semibold"><%= @load.pickup_location %></div>
+      </div>
+      <div class="col-md-3">
+        <div class="small text-muted">Drop-off</div>
+        <div class="fw-semibold"><%= @load.dropoff_location %></div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div id="map"></div>
+<div class="row g-4">
+ 
+  <div class="col-lg-5">
+    <div class="card card-soft h-100">
+      <div class="card-header fw-semibold">Saved Stops for This Load</div>
+      <div class="list-group list-group-flush">
+        <% if @selected_stops.present? %>
+          <% @selected_stops.each do |load_stop| %>
+            <% stop = load_stop.stoppable %>
+            <div class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="me-3">
+                <% if load_stop.stoppable_type == "TruckStop" %>
+                  <strong><%= stop.name %></strong>
+                  <% if stop.respond_to?(:provider) && stop.provider.present? %>
+                    <span class="badge text-bg-primary ms-2"><%= stop.provider %></span>
+                  <% end %>
+                  <div class="small text-muted">
+                    <% parts = [stop.try(:street), stop.try(:city), stop.try(:state), stop.try(:zip_code)].compact.reject(&:blank?) %>
+                    <% if parts.any? %><%= parts.join(", ") %><% end %>
+                  </div>
+                <% elsif load_stop.stoppable_type == "RestArea" %>
+                  <strong><%= stop.try(:name).presence || "Rest Area" %></strong>
+                  <div class="small text-muted">
+                    <% bits = [] %>
+                    <% bits << stop.try(:state) if stop.respond_to?(:state) %>
+                    <% bits << stop.try(:highway_route) if stop.respond_to?(:highway_route) %>
+                    <% bits << "MP #{stop.mile_post}" if stop.respond_to?(:mile_post) && stop.mile_post.present? %>
+                    <% bits << "Spots: #{stop.number_of_spots}" if stop.respond_to?(:number_of_spots) && stop.number_of_spots.present? %>
+                    <%= bits.join(" • ") %>
+                  </div>
+                <% else %> <%# WeighStation %>
+                  <strong><%= stop.try(:name).presence || "Weigh Station" %></strong>
+                  <div class="small text-muted">
+                    <% wsbits = [] %>
+                    <% wsbits << stop.try(:state) if stop.respond_to?(:state) %>
+                    <% wsbits << stop.try(:functional) if stop.respond_to?(:functional) %>
+                    <%= wsbits.join(" • ") %>
+                  </div>
+                <% end %>
+              </div>
+
+              <%= button_to "Remove",
+                  remove_stop_load_path(@load, stop_id: load_stop.id),
+                  method: :delete,
+                  form: { class: "d-inline" },
+                  class: "btn btn-link text-danger p-0",
+                  data: { confirm: "Remove this stop from the load?" } %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="list-group-item text-muted">
+            No stops saved yet. Go to <%= link_to "Edit pre-plan", plan_load_path(@load) %>.
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map (right) -->
+  <div class="col-lg-7">
+    <div class="card card-soft h-100">
+      <div class="card-header fw-semibold">Route Map</div>
+      <div class="card-body">
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <%
 stops_payload = (@selected_stops || []).map do |load_stop|
@@ -43,86 +141,38 @@ end.compact
 %>
 
 <script nonce="<%= content_security_policy_nonce %>">
-  function initLoadShowMap(){
+  function initLoadShowMap() {
     const el = document.getElementById("map");
-    if(!el || el.dataset.initialized) return;
-    if(!window.L) { setTimeout(initLoadShowMap,100); return; }
-    el.dataset.initialized="1";
+    if (!el || el.dataset.initialized) return;
+    if (!window.L) return;
+    el.dataset.initialized = "1";
 
     const pickup  = [<%= @load.pickup_lat  || 'null' %>, <%= @load.pickup_lon  || 'null' %>];
     const dropoff = [<%= @load.dropoff_lat || 'null' %>, <%= @load.dropoff_lon || 'null' %>];
 
-    if(!pickup[0] || !dropoff[0]) { el.innerHTML = "<div class='text-muted'>No coordinates on this load yet.</div>"; return; }
+    if (!pickup[0] || !dropoff[0]) {
+      el.innerHTML = "<div class='alert alert-warning mb-0'>No coordinates on this load yet.</div>";
+      return;
+    }
 
     const map = L.map(el).setView([(pickup[0]+dropoff[0])/2.0, (pickup[1]+dropoff[1])/2.0], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
 
-    const m1 = L.marker(pickup).addTo(map).bindPopup("Pickup: <%= j @load.pickup_location %>");
-    const m2 = L.marker(dropoff).addTo(map).bindPopup("Drop-off: <%= j @load.dropoff_location %>");
+    L.marker(pickup).addTo(map).bindPopup("Pickup: <%= j @load.pickup_location %>");
+    L.marker(dropoff).addTo(map).bindPopup("Drop-off: <%= j @load.dropoff_location %>");
     const line = L.polyline([pickup, dropoff], {weight: 4}).addTo(map);
     map.fitBounds(line.getBounds().pad(0.25));
 
     const savedStops = <%= raw stops_payload.to_json %>;
-    const colorByType = (t) => t==="TruckStop"?"blue":(t==="RestArea"?"green":"red");
-    savedStops.forEach(s=>{
-      L.circleMarker([s.lat,s.lon],{radius:6,color:colorByType(s.type)})
+    const colorByType = (t) => t === "TruckStop" ? "blue" : (t === "RestArea" ? "green" : "red");
+    savedStops.forEach(s => {
+      L.circleMarker([s.lat, s.lon], {radius: 6, color: colorByType(s.type)})
         .addTo(map)
-        .bindPopup(`<strong>${s.name}</strong><br>${s.address||""}<br><a href="${s.url}">View</a>`);
+        .bindPopup(`<strong>${s.name}</strong><br>${s.address || ""}<br><a href="${s.url}">View</a>`);
     });
   }
-  document.addEventListener("turbo:load", initLoadShowMap);
-  document.addEventListener("turbo:render", initLoadShowMap);
-  document.addEventListener("DOMContentLoaded", initLoadShowMap);
+  const waitForLeafletThenInit = (n=0)=> window.L ? initLoadShowMap() : (n>40?0:setTimeout(()=>waitForLeafletThenInit(n+1),100));
+  document.addEventListener("turbo:load",  () => waitForLeafletThenInit());
+  document.addEventListener("turbo:render", () => waitForLeafletThenInit());
+  document.addEventListener("DOMContentLoaded", () => waitForLeafletThenInit());
 </script>
-
-<hr>
-
-<h3>Saved Stops for This Load</h3>
-<% if @selected_stops.present? %>
-  <ul class="list-unstyled">
-    <% @selected_stops.each do |load_stop| %>
-      <% stop = load_stop.stoppable %>
-      <li class="mb-2">
-        <% if load_stop.stoppable_type == "TruckStop" %>
-          <strong><%= stop.name %></strong>
-          <% if stop.respond_to?(:provider) && stop.provider.present? %>
-            <span class="badge bg-info-subtle text-dark border"><%= stop.provider %></span>
-          <% end %>
-          <small class="text-muted">
-            <% parts = [stop.try(:street), stop.try(:city), stop.try(:state), stop.try(:zip_code)].compact.reject(&:blank?) %>
-            <% if parts.any? %> — <%= parts.join(", ") %><% end %>
-          </small>
-
-        <% elsif load_stop.stoppable_type == "RestArea" %>
-          <strong><%= stop.try(:name).presence || "Rest Area" %></strong>
-          <small class="text-muted">
-            <% bits = [] %>
-            <% bits << stop.try(:state) if stop.respond_to?(:state) %>
-            <% bits << stop.try(:highway_route) if stop.respond_to?(:highway_route) %>
-            <% bits << "MP #{stop.mile_post}" if stop.respond_to?(:mile_post) && stop.mile_post.present? %>
-            <% bits << "Spots: #{stop.number_of_spots}" if stop.respond_to?(:number_of_spots) && stop.number_of_spots.present? %>
-            <% if bits.any? %> — <%= bits.join(" • ") %><% end %>
-          </small>
-
-        <% else %> <%# WeighStation %>
-          <strong><%= stop.try(:name).presence || "Weigh Station" %></strong>
-          <small class="text-muted">
-            <% wsbits = [] %>
-            <% wsbits << stop.try(:state) if stop.respond_to?(:state) %>
-            <% wsbits << stop.try(:functional) if stop.respond_to?(:functional) %>
-            <% if wsbits.any? %> — <%= wsbits.join(" • ") %><% end %>
-          </small>
-        <% end %>
-
-        <%# Only allow removing if it’s not a weigh station (since they’re auto-included) %>
-        <% unless load_stop.stoppable_type == "WeighStation" %>
-          <%= button_to "Remove", remove_stop_load_path(@load, stop_id: load_stop.id),
-                method: :delete, form: { style: "display:inline" },
-                class: "btn btn-link btn-sm", data: { turbo_confirm: "Remove this stop?" } %>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p class="text-muted">No stops saved yet. Go to <%= link_to "Edit pre-plan", preplan_load_path(@load) %>.</p>
-<% end %>
