@@ -1,3 +1,50 @@
+
+<div class="card card-soft mb-4">
+  <div class="card-body">
+    <%= form_with url: preplan_load_path(@load), method: :get, local: true do %>
+      <div class="row g-3 align-items-end">
+        <div class="col-sm-3">
+          <%= label_tag :buffer, "Buffer (miles)", class: "form-label" %>
+          <%= number_field_tag :buffer, (@buffer || 15), min: 5, max: 50, step: 1, class: "form-control" %>
+        </div>
+
+        <div class="col-sm-3">
+          <%= label_tag :min_parking, "Min Truck Parking", class: "form-label" %>
+          <%= number_field_tag :min_parking, params[:min_parking], min: 0, step: 1, placeholder: "e.g. 20", class: "form-control" %>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Providers</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% ["Love's","Pilot","Flying J","TA","Petro","AMBEST","Pilot Flying J"].each do |label| %>
+              <% id = "prov_#{label.parameterize}" %>
+              <div class="form-check">
+                <%= check_box_tag "providers[]", label, Array(params[:providers]).include?(label),
+                    id: id, class: "form-check-input" %>
+                <%= label_tag id, label, class: "form-check-label" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="col-auto">
+          <%= submit_tag "Update", class: "btn btn-rr" %>
+          <%= link_to "Reset", preplan_load_path(@load), class: "btn btn-link" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="text-muted mb-3">
+  <em>
+    Found <%= @rest_areas_on_route&.size || 0 %> rest areas,
+    <%= @weigh_stations_on_route&.size || 0 %> weigh stations,
+    and <%= @truck_stops_on_route&.size || 0 %> truck stops within <%= @buffer || 15 %> miles.
+  </em>
+</p>
+
+
 <%= form_with url: add_stops_load_path(@load), method: :post, local: true do %>
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col">

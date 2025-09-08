@@ -107,7 +107,7 @@ def preplan
   buffer = params[:buffer].presence.to_i
   buffer = 15 if buffer <= 0 || buffer > 50
 
-  # read filters
+  
   providers   = Array(params[:providers]).reject(&:blank?)
   providers_n = providers.map { |p| p.to_s.downcase.strip } # normalized
   min_parking = params[:min_parking].presence&.to_i
@@ -132,15 +132,15 @@ def preplan
   ra_box = RestArea.where(ra_lat => min_lat..max_lat, ra_lon => min_lon..max_lon)
   ws_box = WeighStation.where(ws_lat => min_lat..max_lat, ws_lon => min_lon..max_lon)
 
-  # base scope inside corridor bbox
+ 
   ts_scope = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
 
-  # provider filter (case/space-insensitive)
+ 
   if providers_n.any?
     ts_scope = ts_scope.where("LOWER(TRIM(provider)) IN (?)", providers_n)
   end
 
-  # parking filter (treat nil as 0 so it gets excluded when min_parking present)
+
   if min_parking
     ts_scope = ts_scope.where("COALESCE(parking_truck, 0) >= ?", min_parking)
   end
@@ -187,18 +187,18 @@ end
       [truck_stop.latitude, truck_stop.longitude], dropoff_coords, units: :mi
     )
 
-    # attach computed distances on the fly so the view can read them
+   
     truck_stop.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
     truck_stop.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
     truck_stop
   end
 
-# sort by nearest to pickup, optional but nice
+
 @truck_stops_on_route.sort_by!(&:miles_from_pickup)
 
 
   @buffer       = buffer
-  @providers    = providers            # echo back to view
+  @providers    = providers            
   @min_parking  = min_parking
   @selected_stop_keys =
     @load.load_stops.pluck(:stoppable_type, :stoppable_id).map { |t,id| "#{t}-#{id}" }
