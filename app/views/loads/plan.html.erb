@@ -1,59 +1,97 @@
-<div class="card-body">
-  <% if @truck_stops_on_route.present? %>
-    <div class="list-group">
-      <% @truck_stops_on_route.each do |truck_stop| %>
-        <label class="list-group-item">
-          <div class="form-check">
-            <%= check_box_tag "selected[]", "TruckStop-#{truck_stop.id}",
-                @selected_stop_keys.include?("TruckStop-#{truck_stop.id}"),
-                class: "form-check-input me-2" %>
-            <span class="fw-semibold"><%= truck_stop.name %></span>
-            <% if truck_stop.provider.present? %>
-              <span class="badge text-bg-primary ms-2"><%= truck_stop.provider %></span>
-            <% end %>
-          </div>
-          <div class="small text-muted mt-1">
-            <%= [truck_stop.street, truck_stop.city, truck_stop.state, truck_stop.zip_code].compact.join(", ") %>
-            <% if defined?(truck_stop.miles_from_pickup) %>
-              • <%= number_with_precision(truck_stop.miles_from_pickup, precision: 1) %> mi from pickup
-              • <%= number_with_precision(truck_stop.miles_to_dropoff,  precision: 1) %> mi to drop-off
-            <% end %>
-            <% if truck_stop.parking_truck.present? %> • Truck parking: <%= truck_stop.parking_truck %><% end %>
-            <% if truck_stop.opening_hours.present? %> • Hours: <%= truck_stop.opening_hours %><% end %>
-            <% if truck_stop.website.present? %> • <a href="<%= truck_stop.website %>" target="_blank" rel="noopener">Website</a><% end %>
-            <% if truck_stop.direction_url.present? %> • <a href="<%= truck_stop.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
-          </div>
-        </label>
-      <% end %>
+<%= form_with url: add_stops_load_path(@load), method: :post, local: true do %>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+      <div class="card card-soft h-100">
+        <div class="card-header fw-semibold">Truck Stops</div>
+        <div class="card-body">
+          <% if @truck_stops_on_route.present? %>
+            <div class="list-group">
+              <% @truck_stops_on_route.each do |truck_stop| %>
+                <label class="list-group-item">
+                  <div class="form-check">
+                    <%= check_box_tag "selected[]", "TruckStop-#{truck_stop.id}",
+                        @selected_stop_keys.include?("TruckStop-#{truck_stop.id}"),
+                        class: "form-check-input me-2" %>
+                    <span class="fw-semibold"><%= truck_stop.name %></span>
+                    <% if truck_stop.provider.present? %>
+                      <span class="badge text-bg-primary ms-2"><%= truck_stop.provider %></span>
+                    <% end %>
+                  </div>
+                  <div class="small text-muted mt-1">
+                    <%= [truck_stop.street, truck_stop.city, truck_stop.state, truck_stop.zip_code].compact.join(", ") %>
+                    <% if truck_stop.parking_truck.present? %> • Truck parking: <%= truck_stop.parking_truck %><% end %>
+                    <% if truck_stop.opening_hours.present? %> • Hours: <%= truck_stop.opening_hours %><% end %>
+                    <% if truck_stop.website.present? %> • <a href="<%= truck_stop.website %>" target="_blank" rel="noopener">Website</a><% end %>
+                    <% if truck_stop.direction_url.present? %> • <a href="<%= truck_stop.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
+                  </div>
+                </label>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-muted">No truck stops in this corridor.</div>
+          <% end %>
+        </div>
+      </div>
     </div>
-  <% else %>
-    <div class="text-muted">No truck stops in this corridor.</div>
-  <% end %>
-</div>
-<div class="card-body">
-  <% if @rest_areas_on_route.present? %>
-    <div class="list-group">
-      <% @rest_areas_on_route.each do |rest_area| %>
-        <label class="list-group-item">
-          <div class="form-check">
-            <%= check_box_tag "selected[]", "RestArea-#{rest_area.id}",
-                @selected_stop_keys.include?("RestArea-#{rest_area.id}"),
-                class: "form-check-input me-2" %>
-            <span class="fw-semibold"><%= rest_area.name.presence || "Rest Area" %></span>
-          </div>
-          <div class="small text-muted mt-1">
-            — <%= rest_area.state %> <%= rest_area.highway_route %>
-            <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
-            <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
-            <% if defined?(rest_area.miles_from_pickup) %>
-              • <%= number_with_precision(rest_area.miles_from_pickup, precision: 1) %> mi from pickup
-              • <%= number_with_precision(rest_area.miles_to_dropoff,  precision: 1) %> mi to drop-off
-            <% end %>
-          </div>
-        </label>
-      <% end %>
+
+    <div class="col">
+      <div class="card card-soft h-100">
+        <div class="card-header fw-semibold">Rest Areas</div>
+        <div class="card-body">
+          <% if @rest_areas_on_route.present? %>
+            <div class="list-group">
+              <% @rest_areas_on_route.each do |rest_area| %>
+                <label class="list-group-item">
+                  <div class="form-check">
+                    <%= check_box_tag "selected[]", "RestArea-#{rest_area.id}",
+                        @selected_stop_keys.include?("RestArea-#{rest_area.id}"),
+                        class: "form-check-input me-2" %>
+                    <span class="fw-semibold"><%= rest_area.name.presence || "Rest Area" %></span>
+                  </div>
+                  <div class="small text-muted mt-1">
+                    — <%= rest_area.state %> <%= rest_area.highway_route %>
+                    <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
+                    <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
+                  </div>
+                </label>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-muted">No rest areas in this corridor.</div>
+          <% end %>
+        </div>
+      </div>
     </div>
-  <% else %>
-    <div class="text-muted">No rest areas in this corridor.</div>
-  <% end %>
-</div>
+
+    <div class="col">
+      <div class="card card-soft h-100">
+        <div class="card-header fw-semibold">Weigh Stations (auto-included)</div>
+        <div class="card-body">
+          <% if @weigh_stations_on_route.present? %>
+            <div class="list-group">
+              <% @weigh_stations_on_route.each do |weigh_station| %>
+                <div class="list-group-item">
+                  <strong><%= weigh_station.name.presence || "Weigh Station" %></strong>
+                  <div class="small text-muted mt-1">
+                    — <%= weigh_station.state %>
+                    <% if defined?(weigh_station.miles_from_pickup) %>
+                      • <%= number_with_precision(weigh_station.miles_from_pickup, precision: 1) %> mi from pickup
+                      • <%= number_with_precision(weigh_station.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-muted">No weigh stations in this corridor.</div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex gap-2">
+    <%= submit_tag "Save selected stops to this load", class: "btn btn-rr" %>
+    <%= link_to "Back to Load", load_path(@load), class: "btn btn-light" %>
+  </div>
+<% end %>
