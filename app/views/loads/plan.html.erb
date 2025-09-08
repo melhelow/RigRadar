@@ -46,22 +46,28 @@
         <div class="card-body">
           <% if @rest_areas_on_route.present? %>
             <div class="list-group">
-              <% @rest_areas_on_route.each do |rest_area| %>
-                <label class="list-group-item">
-                  <div class="form-check">
-                    <%= check_box_tag "selected[]", "RestArea-#{rest_area.id}",
-                        @selected_stop_keys.include?("RestArea-#{rest_area.id}"),
-                        class: "form-check-input me-2" %>
-                    <span class="fw-semibold"><%= rest_area.name.presence || "Rest Area" %></span>
-                  </div>
-                  <div class="small text-muted mt-1">
-                    — <%= rest_area.state %> <%= rest_area.highway_route %>
-                    <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
-                    <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
-                  </div>
-                </label>
-              <% end %>
-            </div>
+  <% @rest_areas_on_route.each do |rest_area| %>
+    <label class="list-group-item">
+      <div class="form-check">
+        <%= check_box_tag "selected[]", "RestArea-#{rest_area.id}",
+            @selected_stop_keys.include?("RestArea-#{rest_area.id}"),
+            class: "form-check-input me-2" %>
+        <span class="fw-semibold"><%= rest_area.name.presence || "Rest Area" %></span>
+      </div>
+      <div class="small text-muted mt-1">
+        — <%= rest_area.state %> <%= rest_area.highway_route %>
+        <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
+        <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
+        <%# ← Show miles here %>
+        <% if defined?(rest_area.miles_from_pickup) %>
+          • <%= number_with_precision(rest_area.miles_from_pickup, precision: 1) %> mi from pickup
+          • <%= number_with_precision(rest_area.miles_to_dropoff,  precision: 1) %> mi to drop-off
+        <% end %>
+      </div>
+    </label>
+  <% end %>
+</div>
+
           <% else %>
             <div class="text-muted">No rest areas in this corridor.</div>
           <% end %>
