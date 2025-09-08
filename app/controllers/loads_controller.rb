@@ -160,19 +160,20 @@ def preplan
 end
 
 
-  @weigh_stations_on_route = ra_box.filter_map do |rest_area|
-  lat = rest_area.public_send(ra_lat)
-  lon = rest_area.public_send(ra_lon)
+  @weigh_stations_on_route = ws_box.filter_map do |weigh_station|
+  lat = weigh_station.public_send(ws_lat)
+  lon = weigh_station.public_send(ws_lon)
   next unless lat && lon
   next unless corridor.include_point?(lat, lon)
 
   miles_from_pickup = Geocoder::Calculations.distance_between(pickup_coords, [lat, lon], units: :mi)
   miles_to_dropoff  = Geocoder::Calculations.distance_between([lat, lon], dropoff_coords, units: :mi)
 
-  rest_area.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
-  rest_area.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
-  rest_area
+  weigh_station.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
+  weigh_station.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
+  weigh_station
 end
+
 
   @truck_stops_on_route =
   ts_scope.filter_map do |truck_stop|
