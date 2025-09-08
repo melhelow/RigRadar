@@ -1,39 +1,49 @@
-<h1 class="mb-3">Your Loads</h1>
-<p><%= link_to "New Load", new_load_path, class: "btn btn-primary btn-sm" %></p>
+<% content_for :hero do %>
+  <section class="hero py-5">
+    <div class="container">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+          <h1 class="display-6 mb-2">Your Loads</h1>
+          <p class="mb-0 text-white-50">Plan routes, pre-plan stops, and view progress at a glance.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <%= link_to "New Load", new_load_path, class: "btn btn-rr btn-lg" %>
+        </div>
+      </div>
+    </div>
+  </section>
+<% end %>
 
 <% if @loads.any? %>
-  <div class="table-responsive">
-    <table class="table table-sm align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>ID</th>
-          <th>Commodity</th>
-          <th>Pickup → Drop-off</th>
-          <th>Status</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @loads.each do |l| %>
-          <tr>
-            <td><%= link_to "##{l.id}", l %></td>
-            <td><%= l.commodity %> · <%= number_with_delimiter(l.weight_lbs) %> lbs</td>
-            <td><%= l.pickup_location %> → <%= l.dropoff_location %></td>
-            <td><span class="badge bg-secondary"><%= l.status.humanize %></span></td>
-            <td class="text-end">
-              <%= link_to "Planned route", load_path(l, anchor: "map"), class: "btn btn-outline-primary btn-sm" %>
-              <%= link_to "Edit pre-plan", preplan_load_path(l), class: "btn btn-secondary btn-sm" %>
-              <%= link_to "Edit load", edit_load_path(l), class: "btn btn-outline-secondary btn-sm" %>
-              <%= button_to "Delete", l, method: :delete,
-                    class: "btn btn-danger btn-sm",
-                    form: { style: "display:inline" },
-                    data: { turbo_confirm: "Delete Load ##{l.id}?" } %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+  <div class="row g-3 mt-3">
+    <% @loads.each do |load| %>
+      <div class="col-12">
+        <div class="card card-soft">
+          <div class="card-body d-flex justify-content-between align-items-start">
+            <div class="me-3">
+              <h5 class="mb-1">
+                <%= link_to "Load ##{load.id} – #{load.commodity}", load_path(load), class: "text-decoration-none" %>
+              </h5>
+              <div class="small text-muted">
+                <span class="badge badge-status me-2"><%= load.status.humanize %></span>
+                <strong>Pickup:</strong> <%= load.pickup_location %> ·
+                <strong>Drop-off:</strong> <%= load.dropoff_location %>
+              </div>
+            </div>
+            <div class="btn-group">
+              <%= link_to "Planned route", load_path(load, anchor: "map"), class: "btn btn-outline-secondary btn-sm" %>
+              <%= link_to "Edit pre-plan", plan_load_path(load), class: "btn btn-rr btn-sm" %>
+              <%= link_to "Edit load", edit_load_path(load), class: "btn btn-outline-primary btn-sm" %>
+              <%= button_to "Delete", load_path(load), method: :delete,
+                    form: { class: "d-inline" },
+                    data: { turbo_confirm: "Delete Load ##{load.id}?" },
+                    class: "btn btn-danger btn-sm" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 <% else %>
-  <p>No loads yet.</p>
+  <div class="alert alert-info mt-4">No loads yet. Create your first one.</div>
 <% end %>
