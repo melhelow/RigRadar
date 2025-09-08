@@ -23,7 +23,7 @@
                     <% if truck_stop.opening_hours.present? %> • Hours: <%= truck_stop.opening_hours %><% end %>
                     <% if truck_stop.website.present? %> • <a href="<%= truck_stop.website %>" target="_blank" rel="noopener">Website</a><% end %>
                     <% if truck_stop.direction_url.present? %> • <a href="<%= truck_stop.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
-                    <%# ← Show miles here %>
+                    
                     <% if defined?(truck_stop.miles_from_pickup) %>
                       <span class="text-danger fw-semibold">
                         • <%= number_with_precision(truck_stop.miles_from_pickup, precision: 1) %> mi from pickup
@@ -61,11 +61,14 @@
                     — <%= rest_area.state %> <%= rest_area.highway_route %>
                     <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
                     <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
-                    <%# ← Show miles here %>
-                    <% if defined?(rest_area.miles_from_pickup) %>
-                      • <%= number_with_precision(rest_area.miles_from_pickup, precision: 1) %> mi from pickup
-                      • <%= number_with_precision(rest_area.miles_to_dropoff,  precision: 1) %> mi to drop-off
-                    <% end %>
+
+                       <% if defined?(rest_area.miles_from_pickup) %>
+                        <span class="text-danger fw-semibold">
+                          • <%= number_with_precision(rest_area.miles_from_pickup, precision: 1) %> mi from pickup
+                          • <%= number_with_precision(rest_area.miles_to_dropoff,  precision: 1) %> mi to drop-off
+                        </span>
+                      <% end %>
+
                   </div>
                 </label>
               <% end %>
@@ -90,9 +93,12 @@
                   <div class="small text-muted mt-1">
                     — <%= weigh_station.state %>
                     <% if defined?(weigh_station.miles_from_pickup) %>
+                    <span class="text-danger fw-semibold">
                       • <%= number_with_precision(weigh_station.miles_from_pickup, precision: 1) %> mi from pickup
                       • <%= number_with_precision(weigh_station.miles_to_dropoff,  precision: 1) %> mi to drop-off
-                    <% end %>
+                    </span>
+                  <% end %>
+
                   </div>
                 </div>
               <% end %>
