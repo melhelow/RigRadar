@@ -46,6 +46,8 @@
 
 
 <%= form_with url: add_stops_load_path(@load), method: :post, local: true do %>
+<%= hidden_field_tag :buffer, (@buffer || 15) %>
+
   <div class="row row-cols-1 row-cols-md-3 g-4">
     <div class="col">
       <div class="card card-soft h-100">
