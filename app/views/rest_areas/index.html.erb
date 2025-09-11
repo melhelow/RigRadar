@@ -25,8 +25,8 @@
       <strong><%= link_to (rest_area.name.presence || "Rest Area"), rest_area_path(rest_area) %></strong>
       <div class="small text-muted">
         — <%= rest_area.state %> <%= rest_area.highway_route %>
-        <% if rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
-        <% if rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
+        <% if rest_area.mile_post.present? %> MP <%= rest_area.mile_post %><% end %>
+        <% if rest_area.number_of_spots.present? %>  Spots: <%= rest_area.number_of_spots %><% end %>
       </div>
     </div>
   <% end %>
