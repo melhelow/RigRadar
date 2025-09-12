@@ -1,0 +1,28 @@
+ # .github/workflows/rubocop.yml
+  name: "Rubocop"
+
+  # run on every push and PR (all branches)
+  on:
+    push:
+    pull_request:
+
+  jobs:
+    rubocop:
+      runs-on: ubuntu-latest
+
+      steps:
+        # 1. fetch your code
+        - uses: actions/checkout@v3
+
+        # 2. set up the right Ruby version
+        - uses: ruby/setup-ruby@v1
+          with:
+            ruby-version: 3.4
+
+        # 3. install your gems (including rubocop-rails-omakase in :development)
+        - name: Install dependencies
+          run: bundle install --jobs 4 --retry 3
+
+        # 4. run RuboCop and fail if there are any offenses
+        - name: Run RuboCop
+          run: bundle exec rubocop --format simple
