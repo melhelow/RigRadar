@@ -76,7 +76,9 @@ gem "htmlbeautifier"
 gem "http"
 gem "kaminari"
 gem "pagy"
-gem "pundit"
+
+gem "pundit", "~> 2.3"
+
 gem "ransack"
 gem "rollbar"
 gem "simple_form"
