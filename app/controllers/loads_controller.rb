@@ -89,8 +89,12 @@ end
   
   def start
     @load.update!(status: :in_transit, started_at: Time.current)
+     if turbo_frame_request?
+    render partial: "loads/load_card", locals: { load: @load }
+  else
     redirect_to @load, notice: "Load started."
   end
+end
 
   def deliver
     @load.update!(status: :delivered)

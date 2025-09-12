@@ -1,0 +1,42 @@
+<%= turbo_frame_tag dom_id(load) do %>
+  <div class="card card-soft">
+    <div class="card-body d-flex justify-content-between align-items-start">
+      <div class="me-3">
+        <h5 class="mb-1">
+          <%= link_to "Load ##{load.id} – #{load.commodity}", load_path(load), class: "text-decoration-none" %>
+        </h5>
+        <div class="small text-muted">
+          <span class="me-2">
+            <%= render "loads/status_badge", status: load.status %>
+          </span>
+          <strong>Pickup:</strong> <%= load.pickup_location %> ·
+          <strong>Drop-off:</strong> <%= load.dropoff_location %>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <%= link_to "Planned route", load_path(load, anchor: "map"), class: "btn btn-outline-secondary btn-sm" %>
+        <%= link_to "Edit pre-plan", plan_load_path(load), class: "btn btn-rr btn-sm" %>
+        <%= link_to "Edit load", edit_load_path(load), class: "btn btn-outline-primary btn-sm" %>
+
+        <% if load.planned? %>
+          <%= button_to "Start", start_load_path(load), method: :post,
+                form: { data: { turbo_frame: dom_id(load) } },
+                class: "btn btn-primary btn-sm" %>
+        <% elsif load.in_transit? %>
+          <%= button_to "Deliver", deliver_load_path(load), method: :post,
+                form: { data: { turbo_frame: dom_id(load) } },
+                class: "btn btn-success btn-sm" %>
+          <%= button_to "Drop", drop_load_path(load), method: :post,
+                form: { data: { turbo_frame: dom_id(load) } },
+                class: "btn btn-danger btn-sm" %>
+        <% end %>
+
+        <%= button_to "Delete", load_path(load), method: :delete,
+              form: { class: "d-inline" },
+              data: { turbo_confirm: "Delete Load ##{load.id}?" },
+              class: "btn btn-outline-danger btn-sm" %>
+      </div>
+    </div>
+  </div>
+<% end %>

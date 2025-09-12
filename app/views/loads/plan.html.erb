@@ -1,4 +1,20 @@
 
+<% content_for :hero do %>
+  <section class="hero py-5">
+    <div class="container">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+          <h1 class="display-6 mb-2">Edit pre-plan</h1>
+          <p class="mb-0 text-white-50">Select rest areas and truck stops; weigh stations are auto-listed.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <%= link_to "Back to Load", load_path(@load), class: "btn btn-light btn-lg" %>
+        </div>
+      </div>
+    </div>
+  </section>
+<% end %>
+
 <div class="card card-soft mb-4">
   <div class="card-body">
     <%= form_with url: preplan_load_path(@load), method: :get, local: true do %>
@@ -30,6 +46,51 @@
         <div class="col-auto">
           <%= submit_tag "Update", class: "btn btn-rr" %>
           <%= link_to "Reset", preplan_load_path(@load), class: "btn btn-link" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="text-muted mb-3">
+  <em>
+    Found <%= @rest_areas_on_route&.size || 0 %> rest areas,
+    <%= @weigh_stations_on_route&.size || 0 %> weigh stations,
+    and <%= @truck_stops_on_route&.size || 0 %> truck stops within <%= @buffer || 15 %> miles.
+  </em>
+</p>
+
+
+<div class="card card-soft mb-4">
+  <div class="card-body">
+    <%= form_with url: preplan_load_path(@load), method: :get, local: true do %>
+      <div class="row g-3 align-items-end">
+        <div class="col-sm-3">
+          <%= label_tag :buffer, "Buffer (miles)", class: "form-label" %>
+          <%= number_field_tag :buffer, (@buffer || 15), min: 5, max: 50, step: 1, class: "form-control" %>
+        </div>
+
+        <div class="col-sm-3">
+          <%= label_tag :min_parking, "Min Truck Parking", class: "form-label" %>
+          <%= number_field_tag :min_parking, params[:min_parking], min: 0, step: 1, placeholder: "e.g. 20", class: "form-control" %>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Providers</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% [["Love's","Love's"],["Pilot","Pilot"],["Flying J","Flying J"],["TA","TA"],["Petro","Petro"],["AMBEST","AMBEST"],["Pilot Flying J","Pilot Flying J"]].each do |label, value| %>
+              <div class="form-check">
+                <%= check_box_tag "providers[]", value, Array(params[:providers]).include?(value),
+                      id: "prov_#{value.parameterize}", class: "form-check-input" %>
+                <%= label_tag "prov_#{value.parameterize}", label, class: "form-check-label" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="col-auto">
+          <%= submit_tag "Update", class: "btn btn-rr" %>
+          <%= link_to "Reset", preplan_load_path(@load), class: "btn btn-link link-light" %>
         </div>
       </div>
     <% end %>
