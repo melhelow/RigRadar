@@ -16,7 +16,8 @@ class LoadsController < ApplicationController
 
 
   def index
-    @loads = current_driver.loads.order(created_at: :desc)
+    @loads = policy_scope(Load).order(created_at: :desc)
+    authorize Load
   end
 
 def show
@@ -56,10 +57,12 @@ end
 
   def new
     @load = current_driver.loads.new
+    authorize @load
   end
 
   def create
     @load = current_driver.loads.new(load_params)
+    authorize @load
     if @load.save
       redirect_to @load, notice: "Load created."
     else
@@ -67,7 +70,8 @@ end
     end
   end
 
-  def edit; end
+  def edit; 
+end
 
   def update
     if @load.update(load_params)
@@ -284,6 +288,7 @@ end
   private
   def set_load
     @load = current_driver.loads.find(params[:id])
+    authorize @load
   end
   def load_params
     params.require(:load).permit(:commodity, :weight_lbs, :pickup_location, :dropoff_location, :deadline)
