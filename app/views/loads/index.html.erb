@@ -1,15 +1,77 @@
 
-<h1>Your Loads</h1>
-<p><%= link_to "New Load", new_load_path %></p>
+<% content_for :hero do %>
+  <section class="hero py-5">
+    <div class="container">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+          <h1 class="display-6 mb-2">Your Loads</h1>
+          <p class="mb-0 text-white-50">Plan routes, pre-plan stops, and update status right from here.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <%= link_to "New Load", new_load_path, class: "btn btn-rr btn-lg" %>
+        </div>
+      </div>
+    </div>
+  </section>
+<% end %>
 
-<ul>
-  <% @loads.each do |load| %>
-    <li>
-      <%= link_to "Load ##{load.id} - #{load.commodity}", load %> (<%= load.status %>)
-      — <%= link_to "Edit pre-plan", preplan_load_path(load), class: "btn btn-secondary" %>
-      <%= link_to "Planned route", load_path(load, anchor: "map"), class: "btn" %>
-      — <%= button_to "Delete", load_path(load), method: :delete, form: { style: "display:inline" },
-            data: { turbo_confirm: "Delete Load ##{load.id}?" } %>
-    </li>
-  <% end %>
-</ul>
+<% if @loads.any? %>
+  <div class="row g-3 mt-3">
+    <% @loads.each do |load| %>
+      <div class="col-12 col-md-6">
+        <div class="card card-soft h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div class="me-3">
+                <h5 class="mb-1">
+                  <%= link_to "Load ##{load.id} – #{load.commodity}", load_path(load), class: "text-decoration-none" %>
+                </h5>
+                <div class="small text-muted">
+                  <strong>Pickup:</strong> <%= load.pickup_location %> ·
+                  <strong>Drop-off:</strong> <%= load.dropoff_location %>
+                </div>
+              </div>
+              <%= render "loads/status_badge", status: load.status %>
+            </div>
+
+            <div class="mt-3 d-flex flex-wrap gap-2">
+              <%= link_to "Planned route", load_path(load, anchor: "map"), class: "btn btn-outline-secondary btn-sm" %>
+              <%= link_to "Edit pre-plan", plan_load_path(load), class: "btn btn-rr btn-sm" %>
+              <%= link_to "Edit load", edit_load_path(load), class: "btn btn-outline-primary btn-sm" %>
+              <%= button_to "Delete", load_path(load),
+                    method: :delete,
+                    form: { class: "d-inline" },
+                    data: { turbo_confirm: "Delete Load ##{load.id}?" },
+                    class: "btn btn-danger btn-sm" %>
+            </div>
+
+            <hr class="my-3">
+
+         
+            <div class="d-flex flex-wrap gap-2">
+              <% if load.planned? %>
+                <%= button_to "Start (In transit)", start_load_path(load),
+                      method: :post, class: "btn btn-primary btn-sm" %>
+                <%= button_to "Drop", drop_load_path(load),
+                      method: :post, class: "btn btn-outline-danger btn-sm",
+                      data: { turbo_confirm: "Drop this load?" } %>
+              <% elsif load.in_transit? %>
+                <%= button_to "Mark delivered", deliver_load_path(load),
+                      method: :post, class: "btn btn-success btn-sm" %>
+                <%= button_to "Drop", drop_load_path(load),
+                      method: :post, class: "btn btn-outline-danger btn-sm",
+                      data: { turbo_confirm: "Drop this load?" } %>
+              <% elsif load.delivered? %>
+                <button class="btn btn-success btn-sm" disabled>Delivered</button>
+              <% elsif load.dropped? %>
+                <button class="btn btn-danger btn-sm" disabled>Dropped</button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info mt-4">No loads yet. Create your first one.</div>
+<% end %>

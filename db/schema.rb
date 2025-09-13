@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_03_025301) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_070258) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -35,6 +35,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_03_025301) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["load_id", "stoppable_type", "stoppable_id"], name: "idx_unique_load_stoppable", unique: true
+    t.index ["load_id", "stoppable_type", "stoppable_id"], name: "index_load_stops_on_load_and_stoppable", unique: true
     t.index ["load_id"], name: "index_load_stops_on_load_id"
     t.index ["stoppable_type", "stoppable_id"], name: "index_load_stops_on_stoppable"
   end
