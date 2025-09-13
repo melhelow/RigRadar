@@ -13,3 +13,57 @@
 @import "bootstrap-utilities.css";
 @import "pico.pagy.css";
 @import "pico.firstdraft.css";
+
+
+:root{
+  --rr-bg: #0f172a;       /* deep navy for navbar/hero */
+  --rr-primary: #2563eb;  /* electric blue */
+  --rr-accent: #22c55e;   /* green accent */
+  --rr-soft: #1f2937;     /* soft slate panel */
+}
+
+
+.navbar-rr {
+  background: var(--rr-bg);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.navbar-rr .navbar-brand {
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: #fff;
+}
+.navbar-rr .nav-link {
+  color: rgba(255,255,255,.85);
+}
+.navbar-rr .nav-link:hover,
+.navbar-rr .nav-link.active {
+  color: #fff;
+}
+
+
+.hero {
+  background: linear-gradient(140deg, var(--rr-bg) 40%, #111827 100%);
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+
+.btn-rr {
+  background: var(--rr-primary);
+  border-color: var(--rr-primary);
+  color: #fff;
+}
+.btn-rr:hover { filter: brightness(1.06); color: #fff; }
+
+
+.card-soft {
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow: 0 8px 28px rgba(2,8,20,.06);
+}
+
+
+.badge-status {
+  background: rgba(37,99,235,.12);
+  color: var(--rr-primary);
+  font-weight: 600;
+}

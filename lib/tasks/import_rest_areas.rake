@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "csv"
 
 namespace :import do
@@ -30,7 +31,7 @@ namespace :import do
         name:            row["name"]
       }.compact
 
-      attrs[:name] ||= [attrs[:state], attrs[:highway_route], ("MP #{attrs[:mile_post]}" if attrs[:mile_post])].compact.join(" ")
+      attrs[:name] ||= [ attrs[:state], attrs[:highway_route], ("MP #{attrs[:mile_post]}" if attrs[:mile_post]) ].compact.join(" ")
 
       rec =
         if attrs[:object_uid].present?

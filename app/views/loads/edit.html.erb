@@ -1,2 +1,4 @@
-<h1>Edit Load</h1>
+<h1>Edit Load <%= @load.id %></h1>
 <%= render "form", load: @load %>
+<p><%= link_to "Back to Load", load_path(@load) %></p>
+

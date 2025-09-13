@@ -1,0 +1,11 @@
+<% css_class =
+     case status.to_s
+     when "planned"    then "text-bg-secondary"
+     when "in_transit" then "text-bg-primary"
+     when "delivered"  then "text-bg-success"
+     when "dropped"    then "text-bg-danger"
+     else "text-bg-light"
+     end %>
+
+<span class="badge <%= css_class %>">...</span>
+

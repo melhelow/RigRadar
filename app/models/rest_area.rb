@@ -27,7 +27,6 @@
 #  index_rest_areas_on_state_and_highway_route_and_mile_post  (state,highway_route,mile_post)
 #
 class RestArea < ApplicationRecord
-
-
-
+has_many :load_stops, as: :stoppable, dependent: :destroy, inverse_of: :stoppable
+  has_many :loads, through: :load_stops
 end
