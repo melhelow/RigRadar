@@ -21,4 +21,3 @@ class Driver < ApplicationRecord
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
   has_many :loads, dependent: :nullify
 end
-

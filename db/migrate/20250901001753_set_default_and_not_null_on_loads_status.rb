@@ -13,4 +13,3 @@ class SetDefaultAndNotNullOnLoadsStatus < ActiveRecord::Migration[8.0]
     change_column_default :loads, :status, nil
   end
 end
-

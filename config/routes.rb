@@ -8,23 +8,22 @@ Rails.application.routes.draw do
   get "rest_areas/show"
   devise_for :drivers
 
-  
+
   resources :loads do
     member do
       get   :preplan
       get   :plan, action: :preplan
-      post  :add_stops 
+      post  :add_stops
       delete :remove_stop
       post :start
       post :deliver
       post :drop
-      post :regeocode 
+      post :regeocode
     end
- 
   end
-  resources :rest_areas,     only: [:index, :show]
-  resources :weigh_stations, only: [:index, :show]
-  resources :truck_stops,     only: [:index, :show]
+  resources :rest_areas,     only: [ :index, :show ]
+  resources :weigh_stations, only: [ :index, :show ]
+  resources :truck_stops,     only: [ :index, :show ]
 
 
   get "about", to: "pages#about"

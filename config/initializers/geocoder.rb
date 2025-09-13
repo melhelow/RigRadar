@@ -6,9 +6,9 @@ if Rails.env.test?
 elsif Rails.env.development?
   if ENV["OFFLINE"] == "1" || ENV["GEOCODER_PROVIDER"] == "test"
     Geocoder.configure(lookup: :test, units: :mi)
-    Geocoder::Lookup::Test.set_default_stub([]) 
+    Geocoder::Lookup::Test.set_default_stub([])
   else
-    
+
     Geocoder.configure(
       lookup: :nominatim,
       timeout: 5,

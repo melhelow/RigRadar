@@ -1,7 +1,7 @@
 # lib/tasks/sample.rake
 namespace :sample do
   desc "Generate demo loads (and attach nearby stops). Usage: bin/rails 'sample:load[COUNT,EMAIL]'"
-  task :load, [:count, :email] => :environment do |_, args|
+  task :load, [ :count, :email ] => :environment do |_, args|
     abort("Refusing to run in production.") if Rails.env.production?
 
     begin
@@ -21,15 +21,15 @@ namespace :sample do
     # A few fixed city pairs with coordinates so we don't depend on geocoder calls.
     city_pairs = [
       { pickup: { name: "Dallas, TX",     lat: 32.7767, lon: -96.7970 },
-        dropoff:{ name: "Davenport, IA",  lat: 41.5236, lon: -90.5776 } },
+        dropoff: { name: "Davenport, IA",  lat: 41.5236, lon: -90.5776 } },
       { pickup: { name: "Chicago, IL",    lat: 41.8781, lon: -87.6298 },
-        dropoff:{ name: "Omaha, NE",      lat: 41.2565, lon: -95.9345 } },
+        dropoff: { name: "Omaha, NE",      lat: 41.2565, lon: -95.9345 } },
       { pickup: { name: "Memphis, TN",    lat: 35.1495, lon: -90.0490 },
-        dropoff:{ name: "Indianapolis, IN",lat: 39.7684, lon: -86.1581 } },
+        dropoff: { name: "Indianapolis, IN", lat: 39.7684, lon: -86.1581 } },
       { pickup: { name: "Atlanta, GA",    lat: 33.7490, lon: -84.3880 },
-        dropoff:{ name: "Nashville, TN",  lat: 36.1627, lon: -86.7816 } },
+        dropoff: { name: "Nashville, TN",  lat: 36.1627, lon: -86.7816 } },
       { pickup: { name: "Denver, CO",     lat: 39.7392, lon: -104.9903 },
-        dropoff:{ name: "Kansas City, MO",lat: 39.0997, lon: -94.5786 } }
+        dropoff: { name: "Kansas City, MO", lat: 39.0997, lon: -94.5786 } }
     ]
 
     commodities = %w[Steel Lumber Produce Electronics Machinery Paper Beverages Furniture DryGoods Pallets]
@@ -108,7 +108,7 @@ namespace :sample do
   end
 
   desc "Delete demo loads (and their stops) for EMAIL (default: demo@example.com)"
-  task :clear, [:email] => :environment do |_, args|
+  task :clear, [ :email ] => :environment do |_, args|
     abort("Refusing to run in production.") if Rails.env.production?
     email = (args[:email] || "demo@example.com").to_s
     driver = Driver.find_by(email: email)

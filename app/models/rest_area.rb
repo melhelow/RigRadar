@@ -29,6 +29,4 @@
 class RestArea < ApplicationRecord
 has_many :load_stops, as: :stoppable, dependent: :destroy, inverse_of: :stoppable
   has_many :loads, through: :load_stops
-
-
 end

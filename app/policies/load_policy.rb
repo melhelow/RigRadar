@@ -2,7 +2,7 @@ class LoadPolicy < ApplicationPolicy
   # index on a class-level record: allow any signed-in driver
   def index? = user.present?
 
- 
+
   def show?       = owns_record?
   def create?     = user.present?
   def update?     = owns_record?
@@ -11,7 +11,7 @@ class LoadPolicy < ApplicationPolicy
 
   def preplan?     = owns_record?
   def add_stops?   = owns_record?
-  def remove_stop? = owns_record?   
+  def remove_stop? = owns_record?
   def start?       = owns_record?
   def deliver?     = owns_record?
   def drop?        = owns_record?

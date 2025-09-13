@@ -25,8 +25,8 @@ class CreateTruckStops < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :truck_stops, [:latitude, :longitude]
-    add_index :truck_stops, [:name, :latitude, :longitude], unique: true, name: "index_truck_stops_on_name_lat_lon"
+    add_index :truck_stops, [ :latitude, :longitude ]
+    add_index :truck_stops, [ :name, :latitude, :longitude ], unique: true, name: "index_truck_stops_on_name_lat_lon"
     add_index :truck_stops, :provider
   end
 end

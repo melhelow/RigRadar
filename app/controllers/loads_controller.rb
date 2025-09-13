@@ -1,8 +1,8 @@
 class LoadsController < ApplicationController
    require "set"
   before_action :authenticate_driver!
- 
-  before_action :set_load, only: [:show, :edit, :update, :destroy, :start, :deliver, :drop, :plan,:preplan, :regeocode, :add_stops, :remove_stop]
+
+  before_action :set_load, only: [ :show, :edit, :update, :destroy, :start, :deliver, :drop, :plan, :preplan, :regeocode, :add_stops, :remove_stop ]
 
   def regeocode
     @load.pickup_location_will_change!
@@ -49,8 +49,6 @@ def show
   else
     @weigh_stations_on_route = []
   end
-
-
 end
 
 
@@ -70,7 +68,7 @@ end
     end
   end
 
-  def edit; 
+  def edit
 end
 
   def update
@@ -86,7 +84,7 @@ end
     redirect_to loads_path, notice: "Load deleted."
   end
 
-  
+
   def start
     @load.update!(status: :in_transit, started_at: Time.current)
     redirect_to @load, notice: "Load started."
@@ -111,7 +109,7 @@ def preplan
   buffer = params[:buffer].presence.to_i
   buffer = 15 if buffer <= 0 || buffer > 50
 
-  
+
   providers   = Array(params[:providers]).reject(&:blank?)
   providers_n = providers.map { |p| p.to_s.downcase.strip } # normalized
   min_parking = params[:min_parking].presence&.to_i
@@ -124,8 +122,8 @@ def preplan
   )
   min_lat, max_lat, min_lon, max_lon = corridor.bbox_with_padding
 
-  pickup_coords  = [@load.pickup_lat,  @load.pickup_lon]
-  dropoff_coords = [@load.dropoff_lat, @load.dropoff_lon]
+  pickup_coords  = [ @load.pickup_lat,  @load.pickup_lon ]
+  dropoff_coords = [ @load.dropoff_lat, @load.dropoff_lon ]
 
 
   ra_lat = RestArea.column_names.include?("lat") ? :lat : :latitude
@@ -136,10 +134,10 @@ def preplan
   ra_box = RestArea.where(ra_lat => min_lat..max_lat, ra_lon => min_lon..max_lon)
   ws_box = WeighStation.where(ws_lat => min_lat..max_lat, ws_lon => min_lon..max_lon)
 
- 
+
   ts_scope = TruckStop.where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
 
- 
+
   if providers_n.any?
     ts_scope = ts_scope.where("LOWER(TRIM(provider)) IN (?)", providers_n)
   end
@@ -155,8 +153,8 @@ def preplan
   next unless lat && lon
   next unless corridor.include_point?(lat, lon)
 
-  miles_from_pickup = Geocoder::Calculations.distance_between(pickup_coords, [lat, lon], units: :mi)
-  miles_to_dropoff  = Geocoder::Calculations.distance_between([lat, lon], dropoff_coords, units: :mi)
+  miles_from_pickup = Geocoder::Calculations.distance_between(pickup_coords, [ lat, lon ], units: :mi)
+  miles_to_dropoff  = Geocoder::Calculations.distance_between([ lat, lon ], dropoff_coords, units: :mi)
 
   rest_area.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
   rest_area.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
@@ -170,8 +168,8 @@ end
   next unless lat && lon
   next unless corridor.include_point?(lat, lon)
 
-  miles_from_pickup = Geocoder::Calculations.distance_between(pickup_coords, [lat, lon], units: :mi)
-  miles_to_dropoff  = Geocoder::Calculations.distance_between([lat, lon], dropoff_coords, units: :mi)
+  miles_from_pickup = Geocoder::Calculations.distance_between(pickup_coords, [ lat, lon ], units: :mi)
+  miles_to_dropoff  = Geocoder::Calculations.distance_between([ lat, lon ], dropoff_coords, units: :mi)
 
   weigh_station.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
   weigh_station.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
@@ -185,13 +183,13 @@ end
     next unless corridor.include_point?(truck_stop.latitude, truck_stop.longitude)
 
     miles_from_pickup = Geocoder::Calculations.distance_between(
-      pickup_coords, [truck_stop.latitude, truck_stop.longitude], units: :mi
+      pickup_coords, [ truck_stop.latitude, truck_stop.longitude ], units: :mi
     )
     miles_to_dropoff = Geocoder::Calculations.distance_between(
-      [truck_stop.latitude, truck_stop.longitude], dropoff_coords, units: :mi
+      [ truck_stop.latitude, truck_stop.longitude ], dropoff_coords, units: :mi
     )
 
-   
+
     truck_stop.define_singleton_method(:miles_from_pickup) { miles_from_pickup }
     truck_stop.define_singleton_method(:miles_to_dropoff)  { miles_to_dropoff }
     truck_stop
@@ -202,10 +200,10 @@ end
 
 
   @buffer       = buffer
-  @providers    = providers            
+  @providers    = providers
   @min_parking  = min_parking
   @selected_stop_keys =
-    @load.load_stops.pluck(:stoppable_type, :stoppable_id).map { |t,id| "#{t}-#{id}" }
+    @load.load_stops.pluck(:stoppable_type, :stoppable_id).map { |t, id| "#{t}-#{id}" }
 
   render :plan
 end
@@ -220,7 +218,7 @@ def add_stops
 
   parsed = chosen_tokens.filter_map do |tok|
     if (m = tok.match(/\A(TruckStop|RestArea|WeighStation)-(\d+)\z/))
-      [m[1], m[2].to_i]
+      [ m[1], m[2].to_i ]
     end
   end
 
@@ -229,9 +227,9 @@ def add_stops
 
   LoadStop.transaction do
     existing = @load.load_stops.pluck(:id, :stoppable_type, :stoppable_id)
-    existing_pairs = existing.map { |(_id, type, sid)| [type, sid] }.to_set
+    existing_pairs = existing.map { |(_id, type, sid)| [ type, sid ] }.to_set
 
-    to_remove_ids = existing.select { |id, type, sid| !desired.include?([type, sid]) }.map(&:first)
+    to_remove_ids = existing.select { |id, type, sid| !desired.include?([ type, sid ]) }.map(&:first)
     removed = @load.load_stops.where(id: to_remove_ids).delete_all
 
     (desired - existing_pairs).each do |(type, stoppable_id)|
@@ -243,7 +241,7 @@ def add_stops
   redirect_to load_path(@load, anchor: "map"),
               notice: "#{added} added, #{removed} removed. Saved your pre-plan."
 
-  # --- Auto-attach weigh stations on the current corridor ---
+# --- Auto-attach weigh stations on the current corridor ---
 buffer = params[:buffer].to_i
 buffer = 15 if buffer <= 0 || buffer > 50
 
@@ -269,7 +267,6 @@ if @load.pickup_lat && @load.pickup_lon && @load.dropoff_lat && @load.dropoff_lo
     @load.load_stops.find_or_create_by!(stoppable: weigh_station)
   end
 end
-
 end
 
 

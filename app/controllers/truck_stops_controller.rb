@@ -8,17 +8,17 @@ class TruckStopsController < ApplicationController
 
     scope = TruckStop.all
 
-   
+
     if params[:q].present?
       q = params[:q].strip
 
-      
+
       if (m = q.match(/\A(.+?),\s*([A-Za-z]{2})\z/))
         city  = m[1].strip
         state = m[2].upcase
         scope = scope.where("city ILIKE ? AND state ILIKE ?", "%#{city}%", "%#{state}%")
       else
-        
+
         tokens = q.split(/[,\s]+/).reject(&:blank?)
         tokens.each do |tok|
           pat = "%#{tok}%"
@@ -27,13 +27,13 @@ class TruckStopsController < ApplicationController
       end
     end
 
-  
+
     if params[:providers].present?
       normalized = Array(params[:providers]).reject(&:blank?).map { |p| p.downcase.strip }
       scope = scope.where("LOWER(TRIM(provider)) IN (?)", normalized) if normalized.any?
     end
 
-   
+
     if params[:min_parking].present?
       n = params[:min_parking].to_i
       scope = scope.where("COALESCE(parking_truck, 0) >= ?", n)

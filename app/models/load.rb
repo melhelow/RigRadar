@@ -66,5 +66,4 @@ class Load < ApplicationRecord
     Geocoder.search(q).first&.coordinates ||
       Geocoder.search("#{q}, USA").first&.coordinates
   end
-
 end

@@ -26,6 +26,5 @@ class LoadStop < ApplicationRecord
   belongs_to :stoppable, polymorphic: true, inverse_of: :load_stops
 
   validates :stoppable_type, inclusion: { in: %w[TruckStop RestArea WeighStation] }
-  validates :stoppable_id, uniqueness: { scope: [:load_id, :stoppable_type] }
-
+  validates :stoppable_id, uniqueness: { scope: [ :load_id, :stoppable_type ] }
 end
