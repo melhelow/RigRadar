@@ -1,0 +1,14 @@
+<nav style="padding:.75rem 1rem; border-bottom:1px solid #eee;">
+  <%= link_to "RigRadar", root_path %>
+  <% if driver_signed_in? %>
+    &nbsp; | <%= link_to "Loads", loads_path %>
+    &nbsp; | <%= link_to "Rest Areas", rest_areas_path %>
+    &nbsp; | <%= link_to "Weigh Stations", weigh_stations_path %>
+    &nbsp; | <%= link_to "Account", edit_driver_registration_path %>
+    &nbsp; | <%= button_to "Sign out", destroy_driver_session_path, method: :delete, form: { style: "display:inline" } %>
+  <% else %>
+    &nbsp; | <%= link_to "About", about_path rescue "#" %>
+    &nbsp; | <%= link_to "Sign in",  new_driver_session_path %>
+    &nbsp; | <%= link_to "Sign up",  new_driver_registration_path %>
+  <% end %>
+</nav>

@@ -1,0 +1,47 @@
+<h1>Truck Stops</h1>
+
+<%= form_with url: truck_stops_path, method: :get, local: true do %>
+  <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
+    <div>
+      <label>Search</label><br>
+      <%= text_field_tag :q, params[:q], placeholder: "Name, city, or state" %>
+    </div>
+
+    <div>
+      <label>Min Truck Parking</label><br>
+      <%= number_field_tag :min_parking, params[:min_parking], min: 0, step: 1, placeholder: "e.g. 20" %>
+    </div>
+
+    <div>
+      <label>Providers</label><br>
+      <% @providers.each do |label| %>
+        <label style="margin-right:.5rem;">
+          <%= check_box_tag "providers[]", label, Array(params[:providers]).include?(label) %> <%= label %>
+        </label>
+      <% end %>
+    </div>
+
+    <div>
+      <%= submit_tag "Filter", class: "btn btn-primary" %>
+      <%= link_to "Reset", truck_stops_path, class: "btn btn-link" %>
+    </div>
+  </div>
+<% end %>
+
+<p><em>Showing <%= @truck_stops.size %> of up to 200 results.</em></p>
+
+<ul>
+  <% @truck_stops.each do |t| %>
+    <li style="margin:.4rem 0;">
+      <strong><%= link_to t.name, truck_stop_path(t) %></strong>
+      <% if t.provider.present? %>(<%= t.provider %>)<% end %><br>
+      <small>
+        <%= [t.street, t.city, t.state, t.zip_code].compact.join(", ") %>
+        <% if t.parking_truck.present? %> • Truck parking: <%= t.parking_truck %><% end %>
+        <% if t.website.present? %> • <a href="<%= t.website %>" target="_blank" rel="noopener">Website</a><% end %>
+        <% if t.direction_url.present? %> • <a href="<%= t.direction_url %>" target="_blank" rel="noopener">Directions</a><% end %>
+      </small>
+    </li>
+  <% end %>
+</ul>
+

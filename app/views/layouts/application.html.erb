@@ -23,6 +23,37 @@
   </head>
 
   <body>
-    <%= yield %>
+  <p class="notice"><%= notice %></p>
+<p class="alert"><%= alert %></p>
+
+<nav style="padding:.75rem 1rem; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between;">
+  <div style="display:flex; gap:1rem; align-items:center;">
+    <%= link_to "RigRadar", root_path %>
+
+    <%# Left-side navigation %>
+    <%= link_to "Rest Areas",      rest_areas_path %>
+    <%= link_to "Weigh Stations",  weigh_stations_path %>
+    <%= link_to "Truck Stops",     truck_stops_path %>
+
+    <% if driver_signed_in? %>
+      <%= link_to "Loads", loads_path %>
+    <% end %>
+  </div>
+
+  <div>
+    <% if driver_signed_in? %>
+      <%= link_to "Account", edit_driver_registration_path %>
+      <%= button_to "Sign out", destroy_driver_session_path, method: :delete, form: { style: "display:inline" } %>
+    <% else %>
+      <%= link_to "Sign in",  new_driver_session_path %>
+      <%= link_to "Sign up",  new_driver_registration_path %>
+    <% end %>
+  </div>
+</nav>
+
+  
+
+<%= yield %>
+
   </body>
 </html>

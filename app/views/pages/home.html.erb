@@ -1,0 +1,12 @@
+<!-- app/views/pages/home.html.erb -->
+<section style="padding:2rem 0;">
+  <h1>RigRadar</h1>
+  <p>Plan your route and see rest areas & DOT weigh stations along the way.</p>
+
+  <p style="margin-top:1rem;">
+    <%= link_to "Get Started", new_driver_session_path, class: "btn btn-primary" %>
+    <span style="margin-left:.5rem;">
+      New here? <%= link_to "Create account", new_driver_registration_path %>
+    </span>
+  </p>
+</section>
