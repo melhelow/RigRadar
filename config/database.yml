@@ -101,3 +101,6 @@ production:
     <<: *primary_production
     database: rig_radar_production_cable
     migrations_paths: db/cable_migrate
+
+
+

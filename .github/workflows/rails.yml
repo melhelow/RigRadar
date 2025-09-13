@@ -59,7 +59,8 @@ jobs:
       # Create & load schema
       - name: Setup test database
         run: |
-          bundle exec rails db:create db:schema:load
+          bundle exec rails db:create RAILS_ENV=test
+          bundle exec rails db:schema:load RAILS_ENV=test
 
       # Run your test suite
       - name: Run specs
