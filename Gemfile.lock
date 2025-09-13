@@ -624,7 +624,7 @@ DEPENDENCIES
   propshaft
   pry-rails
   puma (>= 5.0)
-  pundit
+  pundit (~> 2.3)
   rails (~> 8.0.2)
   rails-controller-testing
   rails-erd
