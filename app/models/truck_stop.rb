@@ -35,4 +35,16 @@ class TruckStop < ApplicationRecord
   has_many :loads, through: :load_stops
   validates :name, presence: true
   validates :latitude, :longitude, numericality: true, allow_nil: true
+
+  scope :in_box, ->(min_lat, max_lat, min_lon, max_lon) {
+  where(latitude: min_lat..max_lat, longitude: min_lon..max_lon)
+}
+scope :by_providers, ->(providers) {
+  return all if providers.blank?
+  where("LOWER(TRIM(provider)) IN (?)", Array(providers).map { _1.to_s.downcase.strip })
+}
+scope :min_parking, ->(n) {
+  return all if n.blank?
+  where("COALESCE(parking_truck, 0) >= ?", n.to_i)
+}
 end
