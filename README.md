@@ -146,7 +146,7 @@ Project Link: <https://github.com/melhelow/RigRadar>
 ## Additional Notes
 
 -   **ERD**: The entity-relationship diagram is generated automatically
-    (`erd.png`).
+    ![Getting Started](.app/assets/images/erd.png)
 
 -   **Testing**:
 
