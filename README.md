@@ -87,6 +87,10 @@ and **Leaflet** for interactive mapping.
 **street view**
 ![Getting Started](./app/assets/images/11.jpg)
 
+## Documentation
+- [Functional Requirements Document](./docs/FRD.md)
+
+
 
 ## Installation
 
@@ -174,7 +178,7 @@ for details.
 
 ## Contact
 
-**MOhamed Elhelw**\
+**Mohamed Elhelw**\
 Email: <melhelw558@gmail.com>\
 Project Link: <https://github.com/melhelow/RigRadar>
 
