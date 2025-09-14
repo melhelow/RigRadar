@@ -50,6 +50,28 @@ Built with **Ruby on Rails 8**, **Devise** for authentication, and
 -   **Responsive UI** -- Bootstrap 5 for desktop and mobile.
 
 ------------------------------------------------------------------------
+## Screenshots
+**Landing page**
+![Getting Started](./app/assets/images/landing_page.jpg)
+**Dashboard**
+![Getting Started](./app/assets/images/dashboard.jpg)
+**Landing page**
+![Getting Started](./app/assets/images/landing_page.jpg)
+**pre-planned**
+![Getting Started](./app/assets/images/pre-planned.jpg)
+**edit pre-plan**
+![Getting Started](./app/assets/images/edit-pre-planned.jpg)
+**create load**
+![Getting Started](./app/assets/images/create-load.jpg)
+**edit load**
+![Getting Started](./app/assets/images/edit-load.jpg)
+**Truck stop db**
+![Getting Started](./app/assets/images/truck-stops.jpg)
+**Rest area db**
+![Getting Started](./app/assets/images/rest-areas.jpg)
+**Weight stations db**
+![Getting Started](./app/assets/images/weight-stations.jpg)
+
 
 ## Installation
 
