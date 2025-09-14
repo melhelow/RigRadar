@@ -3,7 +3,7 @@ require "csv"
 
 namespace :import do
   desc "Import cleaned truck stops into truck_stops (schema-safe)"
-  task :truckstops_verified, [ :path ] => :environment do |_t, args|
+  task :truckstops_verified, [:path] => :environment do |_t, args|
   path = args[:path] || "db/data/truck_stops_verified.csv"
   abort "CSV not found: #{path}" unless File.exist?(path)
 
