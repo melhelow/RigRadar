@@ -29,4 +29,7 @@ class WeighStation < ApplicationRecord
 has_many :load_stops, as: :stoppable, dependent: :destroy, inverse_of: :stoppable
 has_many :loads, through: :load_stops
 validates :lat, :lon, numericality: true, allow_nil: true
+scope :in_box, ->(min_lat, max_lat, min_lon, max_lon) {
+  where(lat: min_lat..max_lat, lon: min_lon..max_lon)
+}
 end
