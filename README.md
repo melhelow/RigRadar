@@ -13,6 +13,8 @@ CI](https://github.com/melhelow/RigRadar/actions/workflows/rails.yml/badge.svg?b
 
 -   [Description](#description)
 -   [Features](#features)
+-   [Screenshots](#screenshots)
+-   [Documentation](#documentation)
 -   [Installation](#installation)
 -   [Usage](#usage)
 -   [Contributing](#contributing)
