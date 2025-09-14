@@ -55,12 +55,12 @@ Built with **Ruby on Rails 8**, **Devise** for authentication, and
 ![Getting Started](./app/assets/images/landing_page.jpg)
 **Dashboard**
 ![Getting Started](./app/assets/images/dashboard.jpg)
-**Landing page**
-![Getting Started](./app/assets/images/landing_page.jpg)
 **pre-planned**
 ![Getting Started](./app/assets/images/pre-planned.jpg)
 **edit pre-plan**
 ![Getting Started](./app/assets/images/edit-pre-planned.jpg)
+**updated pre-plan**
+![Getting Started](./app/assets/images/updated-preplaned.jpg)
 **create load**
 ![Getting Started](./app/assets/images/create-load.jpg)
 **edit load**
