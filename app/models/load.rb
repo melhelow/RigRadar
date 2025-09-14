@@ -36,7 +36,11 @@ class Load < ApplicationRecord
   has_many :truck_stops,    through: :load_stops, source: :stoppable, source_type: "TruckStop"
   enum :status, { planned: 0, in_transit: 1, delivered: 2, dropped: 3 }
 
-  validates :commodity, :weight_lbs, :pickup_location, :dropoff_location, presence: true
+  validates :commodity, :pickup_location, :dropoff_location, presence: true
+  validates :weight_lbs, presence: true,
+  numericality: { only_integer: true, greater_than: 0 }
+  validates :pickup_lat, :pickup_lon, :dropoff_lat, :dropoff_lon,
+  numericality: true, allow_nil: true
 
   after_validation :geocode_pickup,  if: -> { will_save_change_to_attribute?(:pickup_location) }
   after_validation :geocode_dropoff, if: -> { will_save_change_to_attribute?(:dropoff_location) }
