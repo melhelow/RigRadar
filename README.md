@@ -28,13 +28,22 @@ RigRadar helps long-haul drivers **pre-plan routes** by discovering
 **Truck Stops**, **Rest Areas**, and **Weigh Stations** within a
 configurable buffer around the pickup→drop-off corridor.
 
-The application: - Builds a dynamic "route" between origin and
-destination. - Filters stops by provider and parking capacity. - Allows
-drivers to **select & save** stops for each load. - **Automatically
-includes weigh stations** along the route.
+The application:
+- Builds a dynamic "route" between origin and destination.
+- Filters stops by provider and parking capacity (number of truck spots).
+- Lets drivers **apply custom filters** to quickly find preferred truck stops.
+- Shows the **nearest truck stops or rest areas** and the **distance** from both pickup and drop-off points.
+- Allows drivers to **click a selected stop or rest area on the map** to view details and highlight the location.
+- Lets drivers **open the route in Google Maps** for real-time navigation.
+- Provides the **precise address and phone number and direction** for each selected truck stop (when available).
+- Driver can access **street view on google map**
+- For **rest areas** and **weigh stations**, phone numbers may not be available,
+  but the driver can still access **location details** and map information.
+- **Automatically includes weigh stations** along the route.
 
-Built with **Ruby on Rails 8**, **Devise** for authentication, and
-**Pundit** for authorization.
+Built with **Ruby on Rails 8**, **Devise** for authentication,
+**Pundit** for authorization, **Bootstrap** for responsive UI,
+and **Leaflet** for interactive mapping.
 
 ------------------------------------------------------------------------
 
@@ -48,6 +57,8 @@ Built with **Ruby on Rails 8**, **Devise** for authentication, and
     to a load.
 -   **Authorization** -- fine-grained access control with Pundit.
 -   **Responsive UI** -- Bootstrap 5 for desktop and mobile.
+-   **Interactive Maps** -- Leaflet for displaying routes and stops.
+
 
 ------------------------------------------------------------------------
 ## Screenshots
@@ -71,6 +82,10 @@ Built with **Ruby on Rails 8**, **Devise** for authentication, and
 ![Getting Started](./app/assets/images/rest-areas.jpg)
 **Weight stations db**
 ![Getting Started](./app/assets/images/weight-stations.jpg)
+**Truck stop info**
+![Getting Started](./app/assets/images/12.jpg)
+**street view**
+![Getting Started](./app/assets/images/11.jpg)
 
 
 ## Installation
