@@ -13,7 +13,7 @@ CI](https://github.com/melhelow/RigRadar/actions/workflows/rails.yml/badge.svg?b
 
 -   [Description](#description)
 -   [Features](#features)
--   [Screenshots](#screenshots)
+-   [Visual Aids](#Visual-Aids)
 -   [Documentation](#documentation)
 -   [Installation](#installation)
 -   [Usage](#usage)
@@ -63,7 +63,7 @@ and **Leaflet** for interactive mapping.
 
 
 ------------------------------------------------------------------------
-## Screenshots
+## Visual Aids
 **Landing page**
 ![Getting Started](./app/assets/images/landing_page.jpg)
 **Dashboard**
