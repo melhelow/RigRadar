@@ -197,6 +197,9 @@ Project Link: <https://github.com/melhelow/RigRadar>
     RAILS_ENV=test bin/rails db:create db:schema:load
     bundle exec rspec
     ```
+    ``` bash
+    bundle exec rspec --format doc
+    ```
 
 -   **CI/CD**: GitHub Actions run RuboCop and Rails tests on each pull
     request.
