@@ -44,7 +44,7 @@ The application:
 - **Automatically includes weigh stations** along the route.
 
 Built with **Ruby on Rails 8**, **Devise** for authentication,
-**Pundit** for authorization, **Bootstrap** for responsive UI,
+**Pundit** for authorization, **Bootstrap** for responsive UI, **Geocoder** for Distance & proximity ,Forward geocoding
 and **Leaflet** for interactive mapping.
 
 ------------------------------------------------------------------------
