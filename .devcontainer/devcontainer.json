@@ -1,45 +1,40 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/universal
 {
-  "name": "Container",
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "name": "RigRadar Dev",
   "image": "firstdraft/appdev-rails-8-template",
 
-  // Features to add to the dev container. More info: https://containers.dev/features.
-  // "features": {},
-
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [3000, 4567, 9292],
-
-  "portsAttributes": {
-    "3000": {
-      "onAutoForward": "silent"
-    },
-    "4567": {
-      "onAutoForward": "silent"
-    },
-    "9292": {
-      "onAutoForward": "silent"
-    }
+  // Rails will read these for dev/test via config/database.yml
+  "containerEnv": {
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "5432",
+    "DB_USER": "postgres",
+    "DB_PASSWORD": "postgres"
   },
 
-  "otherPortsAttributes": {"onAutoForward": "ignore"},
+  // Only expose the web-ish ports; hide Postgres from the Ports panel
+  "forwardPorts": [3000, 4567, 9292],
+  "portsAttributes": {
+    "3000": { "onAutoForward": "silent" },
+    "4567": { "onAutoForward": "silent" },
+    "9292": { "onAutoForward": "silent" }
+  },
+  "otherPortsAttributes": { "onAutoForward": "ignore" },
 
-  // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bin/setup && gem install rufo && gem install htmlbeautifier",
+  // Install Postgres if the base image didn’t include it
+  "postCreateCommand": "/bin/sh -lc 'set -eux; if ! command -v psql >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib; fi; gem install rufo htmlbeautifier || true'",
 
-  // Configure tool-specific properties.
+  // Always start the DB when the Codespace boots, then prepare the Rails DB (idempotent)
+  "postStartCommand": "/bin/sh -lc 'set -eux; (sudo service postgresql start || sudo pg_ctlcluster 16 main start || true); pg_isready -h 127.0.0.1 -p 5432 || true; unset DATABASE_URL || true; bin/rails db:prepare || true'",
+
   "customizations": {
     "vscode": {
-      "extensions": ["vortizhe.simple-ruby-erb",
-                     "mbessey.vscode-rufo",
-                     "aliariff.vscode-erb-beautify",
-                     "eamodio.gitlens",
-                     "setobiralo.erb-commenter",
-                     "firstdraft.terminal-clear"]
+      "extensions": [
+        "vortizhe.simple-ruby-erb",
+        "mbessey.vscode-rufo",
+        "aliariff.vscode-erb-beautify",
+        "eamodio.gitlens",
+        "setobiralo.erb-commenter",
+        "firstdraft.terminal-clear"
+      ]
     }
   }
-
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-  // "remoteUser": "root"
 }
