@@ -11,6 +11,7 @@ RigRadar is a route-aware planning web app that:
 - Builds a **pickup→drop-off corridor** with a configurable buffer (e.g. ±15 mi).
 - Lists **Truck Stops**, **Rest Areas**, and auto-includes **Weigh Stations** inside that corridor.
 - Lets users **filter** stops by provider and by **number of truck-parking spots**.
+- Lets users filter stops by his prefered truck stops chains whether its ** PILOT, LOVE'S, TA, PETRO , AMBEST or FLYING J ** 
 - Shows **nearest distance** from pickup and drop-off.
 - Allows drivers to **select & save** preferred stops and view them on a **Leaflet map**.
 - Provides **precise address and phone** for truck stops (and location info for rest areas & weigh stations).
