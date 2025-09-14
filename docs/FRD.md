@@ -1,8 +1,8 @@
 # RigRadar – Functional Requirements Document
 
 ## 1. Problem Description
-Long–haul truck drivers lose valuable on-duty time trying to locate *** truck stops, weigh stations ***, and safe *** overnight parking ***.
-Studies (e.g., U.S. DOT “Jason’s Law” surveys and ATRI research) show that drivers commonly spend about *** 45 – 75 minutes per day *** searching for parking, detouring for fuel, or finding a scale.
+Long–haul truck drivers lose valuable on-duty time trying to locate **truck stops, weigh stations**, and safe **overnight parking**.
+Studies (e.g., U.S. DOT “Jason’s Law” surveys and ATRI research) show that drivers commonly spend about **45 – 75 minutes per day** searching for parking, detouring for fuel, or finding a scale.
 This hidden delay wastes fuel, reduces driving hours, and complicates scheduling.
 Without better tools, drivers—and the dispatchers or freight brokers who help plan their trips—cannot reliably pre-plan stops for rest, fueling, and weighing along the intended corridor.
 
