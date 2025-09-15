@@ -1,37 +1,16 @@
 {
   "name": "RigRadar",
-  "image": "firstdraft/appdev-rails-8-template",
-
+  "remoteUser": "vscode",
   "containerEnv": {
     "DB_HOST": "127.0.0.1",
-    "DB_PORT": "5432",
+    "DB_PORT": "5433",
     "DB_USER": "postgres",
     "DB_PASSWORD": "postgres"
   },
-
-  "forwardPorts": [3000, 4567, 9292],
+  "postStartCommand": "bash .devcontainer/scripts/start-user-postgres.sh",
+  "forwardPorts": [3000, 5433],
   "portsAttributes": {
-    "3000": { "onAutoForward": "silent" },
-    "4567": { "onAutoForward": "silent" },
-    "9292": { "onAutoForward": "silent" },
-    "5432": { "onAutoForward": "ignore" }
-  },
-  "otherPortsAttributes": { "onAutoForward": "ignore" },
-
-  "postCreateCommand": "bash -lc '\nset -eux\nexport DEBIAN_FRONTEND=noninteractive\nsudo apt-get update\nsudo apt-get install -y postgresql postgresql-contrib libpq-dev\n# figure out PG major (e.g. 16)\nPGVER=$(pg_lsclusters --no-header 2>/dev/null | awk \"{print \\$1; exit}\") || true\nif [ -z \"${PGVER:-}\" ]; then PGVER=$(ls -1 /etc/postgresql 2>/dev/null | sort -V | tail -n1 || true); fi\n[ -n \"${PGVER:-}\" ] || { echo \"No PostgreSQL installed\" >&2; exit 1; }\n# harden localhost auth to SCRAM (idempotent)\nsudo sed -i -E \"s/^(host\\s+all\\s+all\\s+127\\\\.0\\\\.0\\\\.1\\/32\\s+).*/\\1scram-sha-256/\" /etc/postgresql/$PGVER/main/pg_hba.conf || true\nsudo sed -i -E \"s/^(host\\s+all\\s+all\\s+::1\\/128\\s+).*/\\1scram-sha-256/\"         /etc/postgresql/$PGVER/main/pg_hba.conf || true\n# start cluster (works in Codespaces without systemd)\nsudo pg_ctlcluster \"$PGVER\" main start || sudo service postgresql start || true\n# set password (safe to re-run)\nsudo -u postgres psql -v ON_ERROR_STOP=1 -c \"ALTER ROLE postgres WITH LOGIN PASSWORD \\\"$DB_PASSWORD\\\";\" || true\n# ensure dev/test DBs\nsudo -u postgres createdb rig_radar_development || true\nsudo -u postgres createdb rig_radar_test || true\n# verify\npg_isready -h \"$DB_HOST\" -p \"$DB_PORT\"\n# app deps + schema\nbundle install\nbin/rails db:prepare\n'",
-
-  "postStartCommand": "bash -lc '\nset -eux\nPGVER=$(pg_lsclusters --no-header 2>/dev/null | awk \"{print \\$1; exit}\") || true\nif [ -z \"${PGVER:-}\" ]; then PGVER=$(ls -1 /etc/postgresql 2>/dev/null | sort -V | tail -n1 || true); fi\n[ -n \"${PGVER:-}\" ] || exit 0\nsudo pg_ctlcluster \"$PGVER\" main start || true\npg_isready -h \"$DB_HOST\" -p \"$DB_PORT\" || true\nbin/rails db:prepare || true\n'",
-
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "vortizhe.simple-ruby-erb",
-        "mbessey.vscode-rufo",
-        "aliariff.vscode-erb-beautify",
-        "eamodio.gitlens",
-        "setobiralo.erb-commenter",
-        "firstdraft.terminal-clear"
-      ]
-    }
+    "3000": { "label": "Rails", "visibility": "public" },
+    "5433": { "label": "Postgres (local)", "visibility": "private" }
   }
 }
