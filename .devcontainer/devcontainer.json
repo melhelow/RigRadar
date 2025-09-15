@@ -4,14 +4,19 @@
 
   "containerEnv": {
     "DB_HOST": "127.0.0.1",
-    "DB_PORT": "5432",
+    "DB_PORT": "5434",
     "DB_USER": "postgres",
     "DB_PASSWORD": "postgres"
   },
 
   "forwardPorts": [3000],
-  
-  "postCreateCommand": "bash -c 'sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib libpq-dev && sudo service postgresql start && sudo -u postgres psql -c \"ALTER ROLE postgres WITH PASSWORD 'postgres';\" && bundle install && bin/rails db:prepare'",
+  "portsAttributes": {
+    "3000": { "label": "Rails" }
+  },
+
+  "postCreateCommand": "bash -lc 'set -e; sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib libpq-dev; ROOT=$PWD; PGDATA=$ROOT/tmp/pgdata; PGLOG=$ROOT/tmp/pg.log; PGPORT=5434; PG_BIN=$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null | sort -V | tail -n1 || true); [ -n \"$PG_BIN\" ] && export PATH=\"$PG_BIN:$PATH\"; mkdir -p \"$ROOT/tmp\"; if [ ! -s \"$PGDATA/PG_VERSION\" ]; then initdb -D \"$PGDATA\" -U postgres --auth-local=trust --auth-host=scram-sha-256; echo \"listen_addresses = '127.0.0.1'\" >> \"$PGDATA/postgresql.conf\"; echo \"port = $PGPORT\" >> \"$PGDATA/postgresql.conf\"; echo \"unix_socket_directories = '$ROOT/tmp'\" >> \"$PGDATA/postgresql.conf\"; echo \"password_encryption = 'scram-sha-256'\" >> \"$PGDATA/postgresql.conf\"; fi; pg_ctl -D \"$PGDATA\" -l \"$PGLOG\" -o \"-p $PGPORT\" start || true; sleep 1; psql -h \"$ROOT/tmp\" -U postgres -d postgres -c \"ALTER ROLE postgres WITH LOGIN PASSWORD 'postgres';\" || true; createdb -h 127.0.0.1 -p $PGPORT -U postgres rig_radar_development || true; createdb -h 127.0.0.1 -p $PGPORT -U postgres rig_radar_test || true; pg_isready -h 127.0.0.1 -p $PGPORT; bundle install; bin/rails db:prepare'",
+
+  "postStartCommand": "bash -lc 'set -e; ROOT=$PWD; PGDATA=$ROOT/tmp/pgdata; PGLOG=$ROOT/tmp/pg.log; PGPORT=5434; PG_BIN=$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null | sort -V | tail -n1 || true); [ -n \"$PG_BIN\" ] && export PATH=\"$PG_BIN:$PATH\"; if [ -s \"$PGDATA/PG_VERSION\" ]; then pg_ctl -D \"$PGDATA\" -l \"$PGLOG\" -o \"-p $PGPORT\" start || true; fi; echo DB_ready_on_port_$PGPORT'",
 
   "customizations": {
     "vscode": {
