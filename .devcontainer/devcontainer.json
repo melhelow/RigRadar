@@ -1,16 +1,24 @@
 {
   "name": "RigRadar",
-  "remoteUser": "vscode",
+  "forwardPorts": [3000],
   "containerEnv": {
     "DB_HOST": "127.0.0.1",
-    "DB_PORT": "5433",
+    "DB_PORT": "5434",
     "DB_USER": "postgres",
     "DB_PASSWORD": "postgres"
   },
-  "postStartCommand": "bash .devcontainer/scripts/start-user-postgres.sh",
-  "forwardPorts": [3000, 5433],
-  "portsAttributes": {
-    "3000": { "label": "Rails", "visibility": "public" },
-    "5433": { "label": "Postgres (local)", "visibility": "private" }
+  "postCreateCommand": "bash .devcontainer/scripts/pg-init.sh || true",
+  "postStartCommand": "bash .devcontainer/scripts/pg-start.sh || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vortizhe.simple-ruby-erb",
+        "mbessey.vscode-rufo",
+        "aliariff.vscode-erb-beautify",
+        "eamodio.gitlens",
+        "setobiralo.erb-commenter",
+        "firstdraft.terminal-clear"
+      ]
+    }
   }
 }
