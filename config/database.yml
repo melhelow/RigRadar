@@ -14,3 +14,4 @@ development:
 test:
   <<: *default
   database: rig_radar_test
+
