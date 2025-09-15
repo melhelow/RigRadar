@@ -2,20 +2,6 @@
   "name": "RigRadar",
   "image": "firstdraft/appdev-rails-8-template",
 
-  // 1. Add PostgreSQL as a feature (This is the key change!)
-  "features": {
-    "ghcr.io/devcontainers/features/postgresql:1": {
-      "version": "16",
-      "startService": true,
-      "env": {
-        "POSTGRES_USER": "postgres",
-        "POSTGRES_PASSWORD": "postgres",
-        "POSTGRES_DB": "rig_radar_development"
-      }
-    }
-  },
-
-  // 2. Your existing env vars are correct and will work with the feature
   "containerEnv": {
     "DB_HOST": "127.0.0.1",
     "DB_PORT": "5432",
@@ -23,20 +9,9 @@
     "DB_PASSWORD": "postgres"
   },
 
-  "forwardPorts": [3000, 4567, 9292],
-  "portsAttributes": {
-    "3000": { "onAutoForward": "silent" },
-    "4567": { "onAutoForward": "silent" },
-    "9292": { "onAutoForward": "silent" },
-    "5432": { "onAutoForward": "ignore" }
-  },
-  "otherPortsAttributes": { "onAutoForward": "ignore" },
-
-  // 3. Vastly simplified postCreateCommand. Just install app dependencies.
-  "postCreateCommand": "bash -lc 'bundle install && bin/rails db:prepare'",
-
-  // 4. postStartCommand is likely no longer needed, but a simple check is safe.
-  "postStartCommand": "bash -lc 'pg_isready -h $DB_HOST -p $DB_PORT && bin/rails db:version'",
+  "forwardPorts": [3000],
+  
+  "postCreateCommand": "bash -c 'sudo apt-get update && sudo apt-get install -y postgresql postgresql-contrib libpq-dev && sudo service postgresql start && sudo -u postgres psql -c \"ALTER ROLE postgres WITH PASSWORD 'postgres';\" && bundle install && bin/rails db:prepare'",
 
   "customizations": {
     "vscode": {
