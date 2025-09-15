@@ -9,12 +9,13 @@ default: &default
 
 development:
   <<: *default
-  database: rig_radar_development
+  database: <%= ENV.fetch("DB_NAME", "rig_radar_development") %>
 
 test:
   <<: *default
-  database: rig_radar_test
+  database: <%= ENV.fetch("DB_TEST_NAME", "rig_radar_test") %>
 
+# Production stays on DATABASE_URL (e.g. Render)
 production:
+  <<: *default
   url: <%= ENV["DATABASE_URL"] %>
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
