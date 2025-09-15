@@ -15,6 +15,3 @@ test:
   <<: *default
   database: rig_radar_test
 
-production:
-  <<: *default
-  database: <%= ENV["DB_NAME"] || "rig_radar_production" %>
