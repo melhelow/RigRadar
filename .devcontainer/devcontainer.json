@@ -1,11 +1,17 @@
 {
   "name": "RigRadar",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
   "forwardPorts": [3000],
+
   "containerEnv": {
-    "DB_HOST": "127.0.0.1",
-    "DB_PORT": "5434",
-    "DB_USER": "postgres",
-    "DB_PASSWORD": "postgres"
+    "PGHOST": "localhost",
+    "PGUSER": "student",
+    "PGPASSWORD": "postgres",
+    "PGDATABASE": "postgres",
+    "DATABASE_URL": "postgres://student:postgres@localhost:5432/rails_8_template?encoding=utf8&pool=5&timeout=5000"
   },
 
   "customizations": {
