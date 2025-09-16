@@ -16,7 +16,7 @@
         <div class="col-12">
           <label class="form-label">Providers</label>
           <div class="d-flex flex-wrap gap-3">
-            <% ["Love's","Pilot","Flying J","TA","Petro","AMBEST","Pilot Flying J"].each do |label| %>
+            <% ["Love's","Pilot","Flying J","TA","Petro","AMBEST"].each do |label| %>
               <% id = "prov_#{label.parameterize}" %>
               <div class="form-check">
                 <%= check_box_tag "providers[]", label, Array(params[:providers]).include?(label),

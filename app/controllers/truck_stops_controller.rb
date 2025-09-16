@@ -3,7 +3,7 @@ class TruckStopsController < ApplicationController
 
   def index
     @providers = [
-      "Love's", "Pilot", "Flying J", "TA", "Petro", "AMBEST", "Pilot Flying J"
+      "Love's", "Pilot", "Flying J", "TA", "Petro", "AMBEST"
     ]
 
     scope = TruckStop.all
