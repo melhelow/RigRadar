@@ -1,6 +1,6 @@
 class SolidCable < ActiveRecord::Migration[8.0]
   def change
-    enable_extension "pg_catalog.plpgsql"
+    #enable_extension "pg_catalog.plpgsql"
 
     create_table "solid_cable_messages", force: :cascade do |t|
       t.binary "channel", null: false

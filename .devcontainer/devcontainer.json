@@ -5,7 +5,7 @@
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
   "forwardPorts": [3000],
-
+   
   "containerEnv": {
     "PGHOST": "localhost",
     "PGUSER": "student",

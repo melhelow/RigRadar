@@ -1,6 +1,6 @@
 class SolidCache < ActiveRecord::Migration[8.0]
   def change
-    enable_extension "pg_catalog.plpgsql"
+    #enable_extension "pg_catalog.plpgsql"
 
     create_table "solid_cache_entries", force: :cascade do |t|
       t.binary "key", null: false
