@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema[8.0].define(version: 2025_09_08_070258) do
   # These are extensions that must be enabled in order to support this database
-  
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "drivers", force: :cascade do |t|
     t.string "email", default: "", null: false
