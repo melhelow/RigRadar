@@ -1,7 +1,7 @@
 class SolidQueue < ActiveRecord::Migration[8.0]
   def change
     # These are extensions that must be enabled in order to support this database
-    #enable_extension "pg_catalog.plpgsql"
+    
 
     create_table "solid_queue_blocked_executions", force: :cascade do |t|
       t.bigint "job_id", null: false
