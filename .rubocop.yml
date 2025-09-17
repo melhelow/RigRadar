@@ -2,11 +2,13 @@ inherit_gem:
   rubocop-rails-omakase: rubocop.yml
 
 AllCops:
+  TargetRubyVersion: 2.7   # ← add this
   NewCops: enable
   Exclude:
     - node_modules/**/*
     - public/**/*
     - vendor/**/*
 
-Style/MixinGrouping:
-  Enabled: false
+Style/EndlessMethod:
+  Enabled: false            # ← and add this section
+

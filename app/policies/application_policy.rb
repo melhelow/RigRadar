@@ -3,28 +3,49 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(user, record)
-    @user = user
+    @user  = user
     @record = record
   end
 
+  def index?
+    false
+  end
 
-  def index?    = false
-  def show?     = false
-  def create?   = false
-  def new?      = create?
-  def update?   = false
-  def edit?     = update?
-  def destroy?  = false
+  def show?
+    false
+  end
 
+  def create?
+    false
+  end
 
+  def new?
+    create?
+  end
+
+  def update?
+    false
+  end
+
+  def edit?
+    update?
+  end
+
+  def destroy?
+    false
+  end
+
+  # Base scope for all policies — note: no `< Scope` here.
   class Scope
     attr_reader :user, :scope
+
     def initialize(user, scope)
       @user  = user
       @scope = scope
     end
+
     def resolve
-      scope.none
+      scope.all
     end
   end
 end
