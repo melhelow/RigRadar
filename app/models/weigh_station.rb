@@ -7,9 +7,12 @@
 #  fips_code       :string
 #  functional      :string
 #  lat             :decimal(10, 6)
+#  latitude        :decimal(10, 6)
 #  lon             :decimal(10, 6)
+#  longitude       :decimal(10, 6)
 #  name            :string
 #  num_days_active :integer
+#  objectid        :bigint
 #  state           :string
 #  station_uid     :string
 #  sum_weight_year :bigint
@@ -18,6 +21,7 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  concat_id       :string
+#  station_id      :string
 #
 # Indexes
 #
