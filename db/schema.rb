@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_17_032904) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_17_062533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,24 +65,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_032904) do
   end
 
   create_table "rest_areas", force: :cascade do |t|
-    t.string "object_uid"
-    t.string "state_number"
-    t.string "nhs_rest_stop"
     t.string "highway_route"
     t.decimal "mile_post", precision: 10, scale: 2
-    t.string "municipality"
-    t.string "county"
     t.string "state"
     t.decimal "lat", precision: 10, scale: 6
     t.decimal "lon", precision: 10, scale: 6
     t.integer "number_of_spots"
-    t.decimal "x", precision: 12, scale: 6
-    t.decimal "y", precision: 12, scale: 6
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["lat", "lon"], name: "index_rest_areas_on_lat_and_lon"
-    t.index ["object_uid"], name: "index_rest_areas_on_object_uid", unique: true
     t.index ["state", "highway_route", "mile_post"], name: "index_rest_areas_on_state_and_highway_route_and_mile_post"
   end
 
@@ -250,51 +242,34 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_032904) do
   create_table "truck_stops", force: :cascade do |t|
     t.string "name", null: false
     t.string "provider"
-    t.string "website"
     t.string "phone"
-    t.string "opening_hours"
     t.string "street"
     t.string "city"
     t.string "state", limit: 2
     t.string "zip_code"
-    t.string "country", default: "US"
-    t.string "status", default: "active"
-    t.text "direction_url"
     t.decimal "latitude", precision: 10, scale: 6
     t.decimal "longitude", precision: 10, scale: 6
     t.integer "parking_truck"
-    t.integer "parking_rv"
-    t.text "raw_details"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "website"
+    t.string "direction_url"
     t.index ["latitude", "longitude"], name: "index_truck_stops_on_latitude_and_longitude"
     t.index ["name", "latitude", "longitude"], name: "index_truck_stops_on_name_lat_lon", unique: true
     t.index ["provider"], name: "index_truck_stops_on_provider"
   end
 
   create_table "weigh_stations", force: :cascade do |t|
-    t.string "station_uid"
-    t.string "concat_id"
-    t.string "fips_code"
     t.string "state"
     t.string "functional"
     t.decimal "lat", precision: 10, scale: 6
     t.decimal "lon", precision: 10, scale: 6
-    t.integer "counts_year"
-    t.bigint "sum_weight_year"
-    t.integer "num_days_active"
-    t.decimal "x", precision: 12, scale: 6
-    t.decimal "y", precision: 12, scale: 6
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "station_id"
-    t.bigint "objectid"
-    t.decimal "latitude", precision: 10, scale: 6
-    t.decimal "longitude", precision: 10, scale: 6
     t.index ["lat", "lon"], name: "index_weigh_stations_on_lat_and_lon"
     t.index ["state", "functional"], name: "index_weigh_stations_on_state_and_functional"
-    t.index ["station_uid"], name: "index_weigh_stations_on_station_uid", unique: true
   end
 
   create_table "widgets", id: :string, force: :cascade do |t|
