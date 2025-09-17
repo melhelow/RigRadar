@@ -15,8 +15,8 @@ class CreateTruckStopParkings < ActiveRecord::Migration[8.0]
       t.decimal :y, precision: 12, scale: 6
       t.timestamps
     end
-    
-    add_index :truck_stop_parkings, [:state, :county]
-    add_index :truck_stop_parkings, [:latitude, :longitude]
+
+    add_index :truck_stop_parkings, [ :state, :county ]
+    add_index :truck_stop_parkings, [ :latitude, :longitude ]
   end
 end

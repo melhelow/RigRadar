@@ -12,6 +12,6 @@ class AddLatLonToRestAreas < ActiveRecord::Migration[7.1]
       change_column :rest_areas, :lon, :decimal, precision: 10, scale: 6
     end
 
-    add_index :rest_areas, [:lat, :lon] unless index_exists?(:rest_areas, [:lat, :lon])
+    add_index :rest_areas, [ :lat, :lon ] unless index_exists?(:rest_areas, [ :lat, :lon ])
   end
 end

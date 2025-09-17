@@ -1,7 +1,7 @@
 # lib/tasks/csv_import.rake
 namespace :csv do
   desc "Import a CSV into a table. Usage: rails 'csv:import[CSV_PATH,TABLE_NAME,BATCH_SIZE]'"
-  task :import, [:csv_path, :table_name, :batch_size] => :environment do |_, args|
+  task :import, [ :csv_path, :table_name, :batch_size ] => :environment do |_, args|
     require "csv"
 
     csv_path  = args[:csv_path]  || abort("CSV_PATH is required, e.g. lib/csvs/truck_stops_verified.csv")
@@ -18,7 +18,7 @@ namespace :csv do
     headers = CSV.open(csv_path, headers: true) { |io| io.first&.headers }
     abort("No headers found in #{csv_path}") if headers.nil? || headers.empty?
 
-    mapped = headers.map { |h| [h, normalizer.call(h)] }.to_h
+    mapped = headers.map { |h| [ h, normalizer.call(h) ] }.to_h
     import_cols = (mapped.values & cols_in_db)
     abort("None of the CSV columns match columns in #{table}. Table has: #{cols_in_db.join(", ")}") if import_cols.empty?
 

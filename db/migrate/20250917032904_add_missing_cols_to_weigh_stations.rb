@@ -11,6 +11,6 @@ class AddMissingColsToWeighStations < ActiveRecord::Migration[8.0]
 
     add_column :weigh_stations, :name, :string unless column_exists?(:weigh_stations, :name)
 
-    add_index  :weigh_stations, [:lat, :lon] unless index_exists?(:weigh_stations, [:lat, :lon])
+    add_index  :weigh_stations, [ :lat, :lon ] unless index_exists?(:weigh_stations, [ :lat, :lon ])
   end
 end

@@ -1,7 +1,5 @@
 class SolidCache < ActiveRecord::Migration[8.0]
   def change
-   
-
     create_table "solid_cache_entries", force: :cascade do |t|
       t.binary "key", null: false
       t.binary "value", null: false

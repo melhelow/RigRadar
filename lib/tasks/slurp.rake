@@ -3,7 +3,7 @@ require "csv"
 
 namespace :slurp do
   desc "Upsert TruckStops from lib/csvs/truck_stops_verified.csv"
-  task :truck_stops => :environment do
+  task truck_stops: :environment do
     path = Rails.root.join("lib", "csvs", "truck_stops_verified.csv")
     abort "CSV not found: #{path}" unless File.exist?(path)
 
@@ -55,7 +55,7 @@ namespace :slurp do
   end
 
   desc "Upsert RestAreas from lib/csvs/NTAD_Truck_Stop_Parking.csv"
-  task :rest_areas => :environment do
+  task rest_areas: :environment do
     path = Rails.root.join("lib", "csvs", "NTAD_Truck_Stop_Parking.csv")
     abort "CSV not found: #{path}" unless File.exist?(path)
 
@@ -82,7 +82,7 @@ namespace :slurp do
         name:            row["name"]
       }.compact
 
-      attrs[:name] ||= [attrs[:state], attrs[:highway_route], ("MP #{attrs[:mile_post]}" if attrs[:mile_post])].compact.join(" ")
+      attrs[:name] ||= [ attrs[:state], attrs[:highway_route], ("MP #{attrs[:mile_post]}" if attrs[:mile_post]) ].compact.join(" ")
 
       rec =
         if attrs[:object_uid].present?
@@ -102,7 +102,7 @@ namespace :slurp do
   end
 
   desc "Upsert WeighStations from lib/csvs/NTAD_Weigh_in_Motion_Stations.csv"
-  task :weigh_stations => :environment do
+  task weigh_stations: :environment do
     path = Rails.root.join("lib", "csvs", "NTAD_Weigh_in_Motion_Stations.csv")
     abort "CSV not found: #{path}" unless File.exist?(path)
 
@@ -147,4 +147,3 @@ namespace :slurp do
     puts "weigh_stations upserted: #{upserts} (total=#{WeighStation.count})"
   end
 end
-
