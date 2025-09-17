@@ -5,19 +5,14 @@
 #
 #  id            :bigint           not null, primary key
 #  city          :string
-#  country       :string           default("US")
-#  direction_url :text
+#  direction_url :string
 #  latitude      :decimal(10, 6)
 #  longitude     :decimal(10, 6)
 #  name          :string           not null
-#  opening_hours :string
-#  parking_rv    :integer
 #  parking_truck :integer
 #  phone         :string
 #  provider      :string
-#  raw_details   :text
 #  state         :string(2)
-#  status        :string           default("active")
 #  street        :string
 #  website       :string
 #  zip_code      :string
