@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_08_070258) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_17_032904) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_070258) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_drivers_on_email", unique: true
     t.index ["reset_password_token"], name: "index_drivers_on_reset_password_token", unique: true
+  end
+
+  create_table "jobs", force: :cascade do |t|
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "load_stops", force: :cascade do |t|
@@ -222,6 +228,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_070258) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "truck_stop_parkings", force: :cascade do |t|
+    t.string "state_number"
+    t.string "nhs_rest_stop"
+    t.string "highway_route"
+    t.decimal "mile_post", precision: 10, scale: 3
+    t.string "municipality"
+    t.string "county"
+    t.string "state"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.integer "number_of_spots"
+    t.decimal "x", precision: 12, scale: 6
+    t.decimal "y", precision: 12, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["latitude", "longitude"], name: "index_truck_stop_parkings_on_latitude_and_longitude"
+    t.index ["state", "county"], name: "index_truck_stop_parkings_on_state_and_county"
+  end
+
   create_table "truck_stops", force: :cascade do |t|
     t.string "name", null: false
     t.string "provider"
@@ -263,9 +288,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_08_070258) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "station_id"
+    t.bigint "objectid"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
     t.index ["lat", "lon"], name: "index_weigh_stations_on_lat_and_lon"
     t.index ["state", "functional"], name: "index_weigh_stations_on_state_and_functional"
     t.index ["station_uid"], name: "index_weigh_stations_on_station_uid", unique: true
+  end
+
+  create_table "widgets", id: :string, force: :cascade do |t|
+    t.string "name"
+    t.decimal "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "load_stops", "loads"
