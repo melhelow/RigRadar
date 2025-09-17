@@ -53,7 +53,7 @@ namespace :csv do
   }.freeze
 
   desc "Import a CSV into a table. Usage: rails 'csv:import[CSV_PATH,TABLE_NAME,BATCH_SIZE]'"
-  task :import, [:csv_path, :table_name, :batch_size] => :environment do |_, args|
+  task :import, [ :csv_path, :table_name, :batch_size ] => :environment do |_, args|
     require "csv"
 
     csv_path = args[:csv_path]  or abort("CSV_PATH is required, e.g. lib/csvs/truck_stops_verified.csv")
@@ -73,7 +73,7 @@ namespace :csv do
     # original header -> destination DB column (or identity if no alias)
     mapped = headers.map do |h|
       n = normalizer.call(h)
-      [h, alias_map[n] || n]
+      [ h, alias_map[n] || n ]
     end.to_h
 
     # DB columns we will actually insert into (skip any that don't exist)
