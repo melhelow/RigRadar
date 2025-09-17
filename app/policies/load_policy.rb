@@ -1,21 +1,52 @@
 class LoadPolicy < ApplicationPolicy
   # index on a class-level record: allow any signed-in driver
-  def index? = user.present?
+  def index?
+    user.present?
+  end
 
+  def show?
+    owns_record?
+  end
 
-  def show?       = owns_record?
-  def create?     = user.present?
-  def update?     = owns_record?
-  def destroy?    = owns_record?
+  def create?
+    user.present?
+  end
 
+  def update?
+    owns_record?
+  end
 
-  def preplan?     = owns_record?
-  def add_stops?   = owns_record?
-  def remove_stop? = owns_record?
-  def start?       = owns_record?
-  def deliver?     = owns_record?
-  def drop?        = owns_record?
-  def regeocode?   = owns_record?
+  def destroy?
+    owns_record?
+  end
+
+  def preplan?
+    owns_record?
+  end
+
+  def add_stops?
+    owns_record?
+  end
+
+  def remove_stop?
+    owns_record?
+  end
+
+  def start?
+    owns_record?
+  end
+
+  def deliver?
+    owns_record?
+  end
+
+  def drop?
+    owns_record?
+  end
+
+  def regeocode?
+    owns_record?
+  end
 
   class Scope < Scope
     def resolve
