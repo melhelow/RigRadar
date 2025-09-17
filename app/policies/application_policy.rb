@@ -35,7 +35,15 @@ class ApplicationPolicy
     false
   end
 
-  class Scope < Scope
+  # Base scope for all policies — note: no `< Scope` here.
+  class Scope
+    attr_reader :user, :scope
+
+    def initialize(user, scope)
+      @user  = user
+      @scope = scope
+    end
+
     def resolve
       scope.all
     end
