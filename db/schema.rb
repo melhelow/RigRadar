@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_17_075521) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_17_093957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -248,6 +248,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_075521) do
     t.datetime "updated_at", null: false
     t.string "website"
     t.string "direction_url"
+    t.string "opening_hours"
     t.index ["latitude", "longitude"], name: "index_truck_stops_on_latitude_and_longitude"
     t.index ["name", "latitude", "longitude"], name: "index_truck_stops_on_name_lat_lon", unique: true
     t.index ["provider"], name: "index_truck_stops_on_provider"

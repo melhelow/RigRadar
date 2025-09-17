@@ -9,6 +9,7 @@
 #  latitude      :decimal(10, 6)
 #  longitude     :decimal(10, 6)
 #  name          :string           not null
+#  opening_hours :string
 #  parking_truck :integer
 #  phone         :string
 #  provider      :string
