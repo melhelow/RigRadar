@@ -1,7 +1,5 @@
 class SolidCable < ActiveRecord::Migration[8.0]
   def change
-   
-
     create_table "solid_cable_messages", force: :cascade do |t|
       t.binary "channel", null: false
       t.binary "payload", null: false
