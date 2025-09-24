@@ -1,4 +1,4 @@
-# app/services/route_corridor.rb
+
 # frozen_string_literal: true
 
 class RouteCorridor
