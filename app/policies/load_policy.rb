@@ -1,5 +1,4 @@
 class LoadPolicy < ApplicationPolicy
-  # index on a class-level record: allow any signed-in driver
   def index?
     user.present?
   end

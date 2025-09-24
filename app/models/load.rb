@@ -26,7 +26,7 @@
 #
 #  fk_rails_...  (driver_id => drivers.id)
 #
-# app/models/load.rb
+
 class Load < ApplicationRecord
   belongs_to :driver
 

@@ -108,7 +108,7 @@
                   </div>
                   <div class="small text-muted mt-1">
                     <%= rest_area.state %> <%= rest_area.highway_route %>
-                    <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %> • MP <%= rest_area.mile_post %><% end %>
+                    <% if rest_area.respond_to?(:mile_post) && rest_area.mile_post.present? %>  MP <%= rest_area.mile_post %><% end %>
                     <% if rest_area.respond_to?(:number_of_spots) && rest_area.number_of_spots.present? %> • Spots: <%= rest_area.number_of_spots %><% end %>
 
                        <% if defined?(rest_area.miles_from_pickup) %>

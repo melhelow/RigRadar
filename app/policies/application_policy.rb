@@ -1,4 +1,4 @@
-# app/policies/application_policy.rb
+
 class ApplicationPolicy
   attr_reader :user, :record
 
@@ -35,7 +35,6 @@ class ApplicationPolicy
     false
   end
 
-  # Base scope for all policies — note: no `< Scope` here.
   class Scope
     attr_reader :user, :scope
 

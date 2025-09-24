@@ -1,4 +1,4 @@
-# app/models/truck_stop.rb
+
 # == Schema Information
 #
 # Table name: truck_stops
