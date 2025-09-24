@@ -182,7 +182,8 @@ for details.
 
 **Mohamed Elhelw**\
 Email: <melhelw558@gmail.com>\
-Project Link: <https://github.com/melhelow/RigRadar>
+Project repo: <https://github.com/melhelow/RigRadar>
+Deployed URL :  <https://rig-radar.onrender.com/>
 
 ------------------------------------------------------------------------
 
