@@ -1,5 +1,6 @@
 
 Rails.application.routes.draw do
+  # NOTE: These routes from line 4-9 are being generated through line 25-27 with the resources, don't forget about DRY principle
   get "truck_stops/index"
   get "truck_stops/show"
   get "weigh_stations/index"

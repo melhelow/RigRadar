@@ -1,4 +1,5 @@
 class LoadPolicy < ApplicationPolicy
+  # NOTE: Awesome that you implemented pundit for the Load model, would love to see it being utilized in the views as well
   def index?
     user.present?
   end

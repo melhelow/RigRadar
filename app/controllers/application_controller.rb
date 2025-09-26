@@ -1,5 +1,6 @@
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::Base
+  # NOTE: indentation in this file looks off
 include Pundit::Authorization
 
    def pundit_user

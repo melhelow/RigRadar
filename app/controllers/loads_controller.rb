@@ -1,4 +1,5 @@
 class LoadsController < ApplicationController
+  # NOTE: The controllers are a bit too large. As a convention, it's best to keep controllers "skinny" by moving all business logic into the corresponding model or a Rails Concern. Also, please ensure the code formatting is consistent.
    require "set"
   before_action :authenticate_driver!
 
@@ -69,6 +70,7 @@ end
   end
 
   def edit
+    # NOTE: No authorize on edit, so will that mean anyone is allowed to edit? 
 end
 
   def update
@@ -80,6 +82,7 @@ end
   end
 
   def destroy
+    # NOTE: No authorize on destroy, so will that mean anyone is allowed to destroy as well? 
     @load.destroy
     redirect_to loads_path, notice: "Load deleted."
   end

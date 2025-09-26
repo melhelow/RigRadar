@@ -1,4 +1,5 @@
  # .github/workflows/rubocop.yml
+  # NOTE: Seems to be duplicate of rails.yml (jobs -> lint)
   name: "Rubocop"
 
   # run on every push and PR (all branches)

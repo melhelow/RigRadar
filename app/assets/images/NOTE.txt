@@ -1,0 +1,1 @@
+Regarding the images folder, it's great that you're using many images and organizing them in one place! For future improvements, consider these suggestions: Be consistent with casing for all filenames. Use more descriptive names instead of generic ones like `11.jpg` or `12.jpg`. You could also move the `erd.png` file into this folder to keep all images together.

@@ -42,6 +42,7 @@ class Load < ApplicationRecord
   validates :pickup_lat, :pickup_lon, :dropoff_lat, :dropoff_lon,
   numericality: true, allow_nil: true
 
+  # NOTE: Good job using Modal Callbacks 
   after_validation :geocode_pickup,  if: -> { will_save_change_to_attribute?(:pickup_location) }
   after_validation :geocode_dropoff, if: -> { will_save_change_to_attribute?(:dropoff_location) }
 

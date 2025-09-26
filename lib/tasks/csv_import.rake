@@ -5,6 +5,7 @@
 #   bundle exec rails 'csv:import[lib/csvs/NTAD_Weigh_in_Motion_Stations.csv,weigh_stations,1000]'
 
 namespace :csv do
+  # NOTE: It's great that you are using a CSV file for your application's data. We suggest mentioning this in the README under a configuration section, so anyone setting up the app knows this data is required to run it properly.
   # Per-table header -> DB column aliases (headers are normalized to snake_case)
   TABLE_ALIASES = {
     "truck_stops" => {
