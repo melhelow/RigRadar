@@ -1,6 +1,7 @@
 class TruckStopsController < ApplicationController
   before_action :authenticate_driver!
 
+  # NOTE: Same idea here as `loads_controller.rb`, the logic should go into the model or it's concern.
   def index
     @providers = [
       "Love's", "Pilot", "Flying J", "TA", "Petro", "AMBEST"

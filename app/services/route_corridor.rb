@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 class RouteCorridor
+  # NOTE: It's great that you created a service object! We'd love to see some comments added to the code. This will make it easier for other developers to review and will also help you if you return to this project after a few months.
   LAT_MI_PER_DEG = 69.0
 
   def initialize(a_lat, a_lon, b_lat, b_lon, buffer_miles: 15)

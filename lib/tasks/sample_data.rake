@@ -3,6 +3,7 @@ require "csv"
 
 desc "Fill the database with sample data (POIs + demo loads). Run: `bin/rails sample_data` or `bundle exec rake sample_data`"
 task sample_data: :environment do
+  # NOTE: Awesome for having sample_data to test the application
   abort("Refusing to run in production.") if Rails.env.production?
 
   puts "== Preparing database =="

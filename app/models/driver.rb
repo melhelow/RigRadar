@@ -18,6 +18,7 @@
 #  index_drivers_on_reset_password_token  (reset_password_token) UNIQUE
 #
 class Driver < ApplicationRecord
+  # NOTE: For scalability, we suggest renaming the table to users and adding a column (e.g., a role attribute) to identify whether a user is a driver or an admin. This keeps all user types in one place.
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
   has_many :loads, dependent: :nullify
 end

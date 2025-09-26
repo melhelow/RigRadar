@@ -46,6 +46,7 @@
 
 
 <%= form_with url: add_stops_load_path(@load), method: :post, local: true do %>
+<%# NOTE: For better security, we'd love to see the field currently using hidden_tag implemented in a more secure way, as hidden fields can still be manipulated by a user. %>
 <%= hidden_field_tag :buffer, (@buffer || 15) %>
 
   <div class="row row-cols-1 row-cols-md-3 g-4">
