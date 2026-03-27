@@ -1,23 +1,19 @@
 name: "Ruby on Rails CI"
-
 on:
   push:
   pull_request:
-
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4
       - run: bundle install --jobs 4 --retry 3
       - run: bundle exec rubocop --format simple
-
   test:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:14
@@ -31,22 +27,16 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4
-
-      # Install gems
       - name: Install dependencies
         run: bundle install --jobs 4 --retry 3
-
-      # Ensure we have a database.yml (if you don't commit one)
       - name: Create database.yml
         run: |
-          cat > config/database.yml <<'EOF'
+          cat > config/database.yml <<'DBEOF'
           test:
             adapter: postgresql
             encoding: unicode
@@ -54,14 +44,10 @@ jobs:
             host: localhost
             username: postgres
             password: postgres
-          EOF
-
-      # Create & load schema
+          DBEOF
       - name: Setup test database
         run: |
           bundle exec rails db:create RAILS_ENV=test
           bundle exec rails db:schema:load RAILS_ENV=test
-
-      # Run your test suite
       - name: Run specs
         run: bundle exec rspec
