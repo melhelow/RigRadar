@@ -15,7 +15,7 @@ namespace :import do
       next if lat.to_s.strip.empty? || lon.to_s.strip.empty?
 
       attrs = {
-        object_uid:      row["OBJECTID"]&.to_s,
+        # object_uid removed in cleanup migration
         state_number:    row["state_number"],
         nhs_rest_stop:   row["nhs_rest_stop"],
         highway_route:   row["highway_route"],
@@ -33,12 +33,7 @@ namespace :import do
 
       attrs[:name] ||= [ attrs[:state], attrs[:highway_route], ("MP #{attrs[:mile_post]}" if attrs[:mile_post]) ].compact.join(" ")
 
-      rec =
-        if attrs[:object_uid].present?
-          RestArea.find_or_initialize_by(object_uid: attrs[:object_uid])
-        else
-          RestArea.find_or_initialize_by(lat: attrs[:lat], lon: attrs[:lon], name: attrs[:name])
-        end
+      rec = RestArea.find_or_initialize_by(lat: attrs[:lat], lon: attrs[:lon], name: attrs[:name])
 
       rec.assign_attributes(attrs)
       if rec.changed?
