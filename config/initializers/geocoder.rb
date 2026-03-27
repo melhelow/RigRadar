@@ -1,5 +1,3 @@
-
-
 if Rails.env.test?
   Geocoder.configure(lookup: :test, units: :mi)
   Geocoder::Lookup::Test.set_default_stub([])
@@ -8,7 +6,6 @@ elsif Rails.env.development?
     Geocoder.configure(lookup: :test, units: :mi)
     Geocoder::Lookup::Test.set_default_stub([])
   else
-
     Geocoder.configure(
       lookup: :nominatim,
       timeout: 5,
@@ -19,8 +16,16 @@ elsif Rails.env.development?
     )
   end
 else
-
-  if ENV["GOOGLE_MAPS_API_KEY"].present?
+  if ENV["LOCATIONIQ_API_KEY"].present?
+    Geocoder.configure(
+      lookup: :location_iq,
+      api_key: ENV["LOCATIONIQ_API_KEY"],
+      timeout: 5,
+      units: :mi,
+      cache: Rails.cache,
+      cache_prefix: "geocoder:"
+    )
+  elsif ENV["GOOGLE_MAPS_API_KEY"].present?
     Geocoder.configure(
       lookup: :google,
       api_key: ENV["GOOGLE_MAPS_API_KEY"],
