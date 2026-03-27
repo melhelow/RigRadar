@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "csv"
 namespace :import do
   desc "Import WeighStations from CSV. Usage: bin/rails import:weigh_stations FILE=db/data/NTAD_Weigh_in_Motion_Stations.csv"

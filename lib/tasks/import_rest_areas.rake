@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "csv"
 namespace :import do
   desc "Import RestAreas from CSV. Usage: bin/rails import:rest_areas FILE=db/data/NTAD_Truck_Stop_Parking.csv"
